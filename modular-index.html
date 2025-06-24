@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.5, maximum-scale=1.5, user-scalable=yes">
+    <title>실시간 종합건설정보(RICS) - 품질관리</title>
+    
+    <!-- CSS 모듈들 -->
+    <link rel="stylesheet" href="src/css/base.css">
+    <link rel="stylesheet" href="src/css/components.css">
+    <link rel="stylesheet" href="src/css/tables-modals.css">
+    <link rel="stylesheet" href="src/css/responsive.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 헤더 -->
+        <div class="header">
+            <h1>실시간 종합건설정보(RICS) - 품질관리</h1>
+            
+            <!-- 작업 필터 체크박스 -->
+            <div class="work-filter-container">
+                <span class="work-filter-title">작업 필터:</span>
+                <div class="work-checkbox-group">
+                    <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
+                        <input type="checkbox" class="work-checkbox" checked>
+                        <span class="work-checkbox-label">🚛 레미콘 타설</span>
+                    </div>
+                    <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
+                        <input type="checkbox" class="work-checkbox" checked>
+                        <span class="work-checkbox-label">🛣️ 도로 포장</span>
+                    </div>
+                    <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
+                        <input type="checkbox" class="work-checkbox" checked>
+                        <span class="work-checkbox-label">⚒️ 다짐</span>
+                    </div>
+                    <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
+                        <input type="checkbox" class="work-checkbox">
+                        <span class="work-checkbox-label">🔧 철근 조립</span>
+                    </div>
+                    <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
+                        <input type="checkbox" class="work-checkbox">
+                        <span class="work-checkbox-label">🛡️ 방수 공사</span>
+                    </div>
+                    <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
+                        <input type="checkbox" class="work-checkbox">
+                        <span class="work-checkbox-label">🔍 기타</span>
+                    </div>
+                    <div class="work-search-container" id="work-search-container" style="display: none;">
+                        <input type="text" class="work-search-input" id="work-search-input" placeholder="작업 키워드 검색...">
+                        <button class="work-search-btn" onclick="searchWork()">검색</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">관</div>
+                <div class="user-details">
+                    <div class="user-name">본사담당자</div>
+                    <div class="user-role">116362 정호수</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 그리드 -->
+        <div class="main-grid">
+            <!-- 왼쪽 컬럼 (3행) -->
+            <div class="left-column">
+                <!-- 1번: 현장 품질등급 현황 -->
+                <div class="grid-item" draggable="true" data-widget-id="1">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <h2 class="section-title">📊 현장 품질등급 현황</h2>
+                    <div class="quality-filter-buttons" id="quality-filter-buttons">
+                        <button class="filter-btn active" data-region="전국">전국</button>
+                        <button class="filter-btn" data-region="수도권">수도권</button>
+                        <button class="filter-btn" data-region="강원권">강원권</button>
+                        <button class="filter-btn" data-region="충청권">충청권</button>
+                        <button class="filter-btn" data-region="영남권">영남권</button>
+                        <button class="filter-btn" data-region="호남권">호남권</button>
+                        <button class="filter-btn" data-region="제주권">제주권</button>
+                    </div>
+                    <div id="quality-chart"></div>
+                </div>
+
+                <!-- 2번: 품질관리 주요 구조물 및 자재 현황 -->
+                <div class="grid-item" draggable="true" data-widget-id="2">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <h2 class="section-title">🏗️ 품질관리 주요 구조물 및 자재 현황</h2>
+                    <div class="structure-filter-buttons" id="structure-filter-buttons">
+                        <button class="filter-btn active" data-region="전국">전국</button>
+                        <button class="filter-btn" data-region="수도권">수도권</button>
+                        <button class="filter-btn" data-region="강원권">강원권</button>
+                        <button class="filter-btn" data-region="충청권">충청권</button>
+                        <button class="filter-btn" data-region="영남권">영남권</button>
+                        <button class="filter-btn" data-region="호남권">호남권</button>
+                        <button class="filter-btn" data-region="제주권">제주권</button>
+                    </div>
+                    <div class="structure-status-table">
+                        <table class="structure-table-horizontal">
+                            <thead>
+                                <tr>
+                                    <th class="structure-header-horizontal">🌉 교량</th>
+                                    <th class="structure-header-horizontal">🧱 옹벽</th>
+                                    <th class="structure-header-horizontal">🚇 지하차도</th>
+                                    <th class="structure-header-horizontal">⚙️ 펌프장</th>
+                                    <th class="structure-header-horizontal">🌊 하천</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="structure-data-row" id="structure-data-row">
+                                    <!-- 동적으로 생성 -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3번: 품질관리자 배치기준 현황 -->
+                <div class="grid-item" draggable="true" data-widget-id="3">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <div class="section-header">
+                        <h2 class="section-title">👷‍♂️ 품질관리자 배치기준 현황</h2>
+                        <button class="sms-button" onclick="showManagerCriteria()">📋 배치 기준</button>
+                    </div>
+                    <div class="quality-manager-filter-buttons" id="quality-manager-filter-buttons">
+                        <button class="filter-btn active" data-region="전국">전국</button>
+                        <button class="filter-btn" data-region="수도권">수도권</button>
+                        <button class="filter-btn" data-region="강원권">강원권</button>
+                        <button class="filter-btn" data-region="충청권">충청권</button>
+                        <button class="filter-btn" data-region="영남권">영남권</button>
+                        <button class="filter-btn" data-region="호남권">호남권</button>
+                        <button class="filter-btn" data-region="제주권">제주권</button>
+                    </div>
+                    <div class="quality-manager-table">
+                        <table class="manager-table-horizontal">
+                            <thead>
+                                <tr>
+                                    <th class="manager-header-horizontal">구분</th>
+                                    <th class="manager-header-horizontal">🔥 특급</th>
+                                    <th class="manager-header-horizontal">⭐ 고급</th>
+                                    <th class="manager-header-horizontal">🛠️ 중급</th>
+                                    <th class="manager-header-horizontal">📋 초급</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manager-table-body-horizontal">
+                                <!-- 동적으로 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 가운데 컬럼 (2행) -->
+            <div class="center-column">
+                <!-- 4번: 금일 레미콘 타설 현장 -->
+                <div class="grid-item" draggable="true" data-widget-id="4">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <div class="section-header">
+                        <h2 class="section-title">🚛 금일 레미콘 타설 현장</h2>
+                        <button class="sms-button" id="sms-button">📱 문자 발송</button>
+                    </div>
+                    <div class="concrete-filter-buttons" id="concrete-filter-buttons">
+                        <button class="filter-btn active" data-region="전국">전국</button>
+                        <button class="filter-btn" data-region="수도권">수도권</button>
+                        <button class="filter-btn" data-region="강원권">강원권</button>
+                        <button class="filter-btn" data-region="충청권">충청권</button>
+                        <button class="filter-btn" data-region="영남권">영남권</button>
+                        <button class="filter-btn" data-region="호남권">호남권</button>
+                        <button class="filter-btn" data-region="제주권">제주권</button>
+                    </div>
+                    <div class="concrete-summary" id="concrete-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">현장 수:</span>
+                            <span class="summary-value" id="concrete-site-count">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">총 타설량:</span>
+                            <span class="summary-value" id="concrete-total-volume">-</span>
+                        </div>
+                    </div>
+                    <div class="site-list" id="concrete-sites"></div>
+                </div>
+
+                <!-- 5번: 금일 도로 포장 현장 -->
+                <div class="grid-item" draggable="true" data-widget-id="5">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <div class="section-header">
+                        <h2 class="section-title">🛣️ 금일 도로 포장 현장</h2>
+                        <button class="sms-button" id="paving-sms-button">📱 문자 발송</button>
+                    </div>
+                    <div class="paving-filter-buttons" id="paving-filter-buttons">
+                        <button class="filter-btn active" data-region="전국">전국</button>
+                        <button class="filter-btn" data-region="수도권">수도권</button>
+                        <button class="filter-btn" data-region="강원권">강원권</button>
+                        <button class="filter-btn" data-region="충청권">충청권</button>
+                        <button class="filter-btn" data-region="영남권">영남권</button>
+                        <button class="filter-btn" data-region="호남권">호남권</button>
+                        <button class="filter-btn" data-region="제주권">제주권</button>
+                    </div>
+                    <div class="paving-summary" id="paving-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">현장 수:</span>
+                            <span class="summary-value" id="paving-site-count">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">총 포장면적:</span>
+                            <span class="summary-value" id="paving-total-area">-</span>
+                        </div>
+                    </div>
+                    <div class="site-list" id="paving-sites"></div>
+                </div>
+            </div>
+
+            <!-- 오른쪽 컬럼 (2행) -->
+            <div class="right-column">
+                <!-- 6번: 금일 다짐 현장 -->
+                <div class="grid-item" draggable="true" data-widget-id="6">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <h2 class="section-title">⚒️ 금일 다짐 현장</h2>
+                    <div class="site-list" id="compaction-sites"></div>
+                </div>
+
+                <!-- 7번: 품질관리 도우미 -->
+                <div class="grid-item" draggable="true" data-widget-id="7">
+                    <div class="drag-indicator">⋮⋮</div>
+                    <h2 class="section-title">🤖 품질관리 도우미</h2>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- 챗봇 메시지들이 동적으로 생성됩니다 -->
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="품질관리 질문을 입력하세요...">
+                        <button class="chat-send" id="chat-send-btn">전송</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 모듈들 (ES6 Modules) -->
+    <script type="module" src="src/js/main.js"></script>
+</body>
+</html>
