@@ -1,55 +1,108 @@
 // 대시보드 데이터 모듈
 
-// 품질등급 현황 데이터
+// 품질등급 현황 데이터 - 색상 코드 수정
 export const qualityData = {
     '전국': [
         { label: '우수', count: 28, color: 'excellent' },
         { label: '양호', count: 45, color: 'good' },
-        { label: '보통', count: 32, color: 'average' },
+        { label: '보통', count: 32, color: 'warning' },
         { label: '미흡', count: 18, color: 'poor' },
-        { label: '불량', count: 8, color: 'bad' }
+        { label: '불량', count: 8, color: 'poor' }
     ],
     '수도권': [
         { label: '우수', count: 12, color: 'excellent' },
         { label: '양호', count: 18, color: 'good' },
-        { label: '보통', count: 11, color: 'average' },
+        { label: '보통', count: 11, color: 'warning' },
         { label: '미흡', count: 6, color: 'poor' },
-        { label: '불량', count: 3, color: 'bad' }
+        { label: '불량', count: 3, color: 'poor' }
     ],
     '강원권': [
         { label: '우수', count: 4, color: 'excellent' },
         { label: '양호', count: 6, color: 'good' },
-        { label: '보통', count: 3, color: 'average' },
+        { label: '보통', count: 3, color: 'warning' },
         { label: '미흡', count: 2, color: 'poor' },
-        { label: '불량', count: 1, color: 'bad' }
+        { label: '불량', count: 1, color: 'poor' }
     ],
     '충청권': [
         { label: '우수', count: 7, color: 'excellent' },
         { label: '양호', count: 10, color: 'good' },
-        { label: '보통', count: 8, color: 'average' },
+        { label: '보통', count: 8, color: 'warning' },
         { label: '미흡', count: 4, color: 'poor' },
-        { label: '불량', count: 2, color: 'bad' }
+        { label: '불량', count: 2, color: 'poor' }
     ],
     '영남권': [
         { label: '우수', count: 15, color: 'excellent' },
         { label: '양호', count: 20, color: 'good' },
-        { label: '보통', count: 14, color: 'average' },
+        { label: '보통', count: 14, color: 'warning' },
         { label: '미흡', count: 7, color: 'poor' },
-        { label: '불량', count: 4, color: 'bad' }
+        { label: '불량', count: 4, color: 'poor' }
     ],
     '호남권': [
         { label: '우수', count: 8, color: 'excellent' },
         { label: '양호', count: 12, color: 'good' },
-        { label: '보통', count: 9, color: 'average' },
+        { label: '보통', count: 9, color: 'warning' },
         { label: '미흡', count: 5, color: 'poor' },
-        { label: '불량', count: 2, color: 'bad' }
+        { label: '불량', count: 2, color: 'poor' }
     ],
     '제주권': [
         { label: '우수', count: 3, color: 'excellent' },
         { label: '양호', count: 4, color: 'good' },
-        { label: '보통', count: 3, color: 'average' },
+        { label: '보통', count: 3, color: 'warning' },
         { label: '미흡', count: 1, color: 'poor' },
-        { label: '불량', count: 1, color: 'bad' }
+        { label: '불량', count: 1, color: 'poor' }
+    ]
+};
+
+// 🏗️ 구조물 현황 데이터 - 누락된 부분 추가!
+export const structureData = {
+    '전국': [
+        { type: '교량', count: 156 },
+        { type: '옹벽', count: 243 },
+        { type: '지하차도', count: 78 },
+        { type: '펌프장', count: 45 },
+        { type: '하천', count: 89 }
+    ],
+    '수도권': [
+        { type: '교량', count: 62 },
+        { type: '옹벽', count: 98 },
+        { type: '지하차도', count: 34 },
+        { type: '펌프장', count: 18 },
+        { type: '하천', count: 28 }
+    ],
+    '강원권': [
+        { type: '교량', count: 18 },
+        { type: '옹벽', count: 24 },
+        { type: '지하차도', count: 6 },
+        { type: '펌프장', count: 4 },
+        { type: '하천', count: 12 }
+    ],
+    '충청권': [
+        { type: '교량', count: 28 },
+        { type: '옹벽', count: 45 },
+        { type: '지하차도', count: 12 },
+        { type: '펌프장', count: 8 },
+        { type: '하천', count: 18 }
+    ],
+    '영남권': [
+        { type: '교량', count: 45 },
+        { type: '옹벽', count: 72 },
+        { type: '지하차도', count: 24 },
+        { type: '펌프장', count: 15 },
+        { type: '하천', count: 31 }
+    ],
+    '호남권': [
+        { type: '교량', count: 32 },
+        { type: '옹벽', count: 54 },
+        { type: '지하차도', count: 18 },
+        { type: '펌프장', count: 12 },
+        { type: '하천', count: 22 }
+    ],
+    '제주권': [
+        { type: '교량', count: 8 },
+        { type: '옹벽', count: 15 },
+        { type: '지하차도', count: 2 },
+        { type: '펌프장', count: 3 },
+        { type: '하천', count: 6 }
     ]
 };
 
