@@ -195,14 +195,14 @@
     color: var(--primary-color);
 }
 
-/* 🏗️ 현장 리스트 - overflow 문제 해결! */
+/* 🏗️ 현장 리스트 - 모든 overflow 제한 제거! */
 .site-list {
     flex: 1;
     overflow-y: auto;
-    overflow-x: visible; /* 🔥 x축 오버플로우 허용으로 툴팁이 잘리지 않게! */
+    overflow-x: visible; /* x축 제한 제거 */
     max-height: 300px;
     padding-right: 5px;
-    position: relative; /* 상대 위치 지정 */
+    position: relative;
 }
 
 .site-list::-webkit-scrollbar {
@@ -230,13 +230,13 @@
     background: var(--surface-color);
     transition: all 0.3s ease;
     position: relative;
-    overflow: visible; /* 🔥 아이템 레벨에서도 오버플로우 허용! */
+    overflow: visible; /* 아이템 레벨에서도 제한 제거 */
 }
 
 .site-item:hover {
     transform: translateX(5px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 10; /* 호버 시 상위로 올리기 */
+    z-index: 10;
 }
 
 .site-info {
@@ -271,7 +271,7 @@
     opacity: 0.7;
 }
 
-/* 🌤️ 날씨 아이콘 및 툴팁 - 간단하고 확실한 방법! */
+/* 🌤️ 날씨 아이콘 - 영역 제한 완전 제거! */
 .weather-icon {
     font-size: 1.2rem;
     margin-left: 8px;
@@ -280,48 +280,31 @@
     z-index: 1;
 }
 
-/* 🔥 툴팁을 왼쪽 정렬로 간단하게! */
+/* 🔥 툴팁을 body에 붙여서 완전 자유롭게! */
 .weather-tooltip {
-    position: absolute;
-    top: -10px; /* 아이콘 위쪽으로 */
-    right: 100%; /* 아이콘 왼쪽으로 */
-    margin-right: 10px; /* 아이콘과 간격 */
+    position: fixed !important; /* fixed로 완전 자유 */
     background: white;
     border: 2px solid var(--primary-color);
     border-radius: 12px;
     padding: 0;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-    z-index: 99999;
-    width: 280px; /* 고정 너비 */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    z-index: 999999 !important; /* 최고 우선순위 */
+    width: 300px;
+    max-width: 90vw; /* 화면 너비의 90% 이하 */
     opacity: 0;
     visibility: hidden;
-    transform: translateX(10px) scale(0.95);
+    transform: scale(0.8);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: none;
+    /* 화면 경계에서 안전 거리 확보 */
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .weather-icon:hover .weather-tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateX(0) scale(1);
-}
-
-/* 🎨 모바일에서는 위쪽으로 표시 */
-@media (max-width: 768px) {
-    .weather-tooltip {
-        top: auto;
-        bottom: 100%;
-        right: auto;
-        left: 50%;
-        margin-right: 0;
-        margin-bottom: 10px;
-        transform: translateX(-50%) translateY(10px) scale(0.95);
-        width: 240px;
-    }
-    
-    .weather-icon:hover .weather-tooltip {
-        transform: translateX(-50%) translateY(0) scale(1);
-    }
+    transform: scale(1);
 }
 
 .tooltip-header {
@@ -498,7 +481,7 @@
     }
     
     .weather-tooltip {
-        width: 220px;
+        width: 260px;
     }
 }
 
@@ -524,6 +507,6 @@
     }
     
     .weather-tooltip {
-        width: 200px;
+        width: 240px;
     }
 }
