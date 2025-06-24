@@ -1,0 +1,262 @@
+/* 반응형 디자인 */
+
+/* 모바일 및 태블릿 */
+@media (max-width: 1200px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .left-column, .center-column, .right-column {
+        grid-template-rows: auto;
+        grid-template-columns: 1fr;
+    }
+    
+    .work-checkbox-group {
+        justify-content: center;
+    }
+    
+    .work-filter-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .summary-stats {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .stat-item {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .table-header, .count-cell, .notice-type {
+        font-size: 0.75rem;
+        padding: 8px 6px;
+    }
+    
+    .bridge-filter-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* 대형 화면 최적화 */
+@media (min-width: 1200px) {
+    .header h1 {
+        font-size: 2.2rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .grid-item {
+        padding: 25px;
+    }
+    
+    .site-item {
+        min-height: 70px;
+        gap: 20px;
+    }
+    
+    .site-name {
+        font-size: 0.9rem;
+    }
+    
+    .chat-messages {
+        min-height: 450px;
+    }
+}
+
+/* 초대형 화면 (1440px+) */
+@media (min-width: 1440px) {
+    .header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.4rem;
+    }
+    
+    .grid-item {
+        padding: 30px;
+    }
+    
+    .manager-cell,
+    .manager-cell-horizontal {
+        padding: 18px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .structure-count-cell {
+        padding: 25px 18px;
+        font-size: 1.3rem;
+    }
+    
+    .summary-value {
+        font-size: 1.3rem;
+    }
+}
+
+/* 4K 화면 (1920px+) */
+@media (min-width: 1920px) {
+    .header h1 {
+        font-size: 2.8rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-container {
+        padding: 30px;
+    }
+    
+    .grid-item {
+        padding: 35px;
+        border-radius: 20px;
+    }
+    
+    .main-grid {
+        gap: 20px;
+    }
+    
+    .left-column,
+    .center-column,
+    .right-column {
+        gap: 20px;
+    }
+}
+
+/* 프린트 최적화 */
+@media print {
+    body {
+        background: white !important;
+        padding: 0;
+    }
+    
+    .dashboard-container {
+        background: white !important;
+        box-shadow: none !important;
+        border-radius: 0;
+        padding: 20px;
+        max-width: none;
+    }
+    
+    .main-grid {
+        display: block;
+        height: auto;
+    }
+    
+    .grid-item {
+        break-inside: avoid;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .header {
+        border-bottom: 2px solid #000;
+        margin-bottom: 30px;
+    }
+    
+    .sms-button,
+    .filter-btn,
+    .chat-input-container,
+    .drag-indicator {
+        display: none !important;
+    }
+    
+    .weather-icon {
+        position: static !important;
+        display: inline-block;
+        margin-left: 10px;
+    }
+    
+    .modal-base {
+        display: none !important;
+    }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+    .grid-item {
+        border: 2px solid #000;
+    }
+    
+    .filter-btn {
+        border: 2px solid #000;
+    }
+    
+    .filter-btn.active {
+        background: #000 !important;
+        color: #fff !important;
+    }
+    
+    .bar-fill {
+        border: 1px solid #000;
+    }
+}
+
+/* 애니메이션 감소 모드 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .grid-item:hover {
+        transform: none !important;
+    }
+    
+    .weather-icon:hover {
+        transform: none !important;
+    }
+    
+    .bar-fill {
+        transition: none !important;
+    }
+}
+
+/* 다크모드 지원 준비 */
+@media (prefers-color-scheme: dark) {
+    .dashboard-container {
+        background: rgba(45, 55, 72, 0.95);
+        color: #e2e8f0;
+    }
+    
+    .grid-item {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .section-title {
+        color: #e2e8f0;
+    }
+    
+    .site-name {
+        color: #e2e8f0;
+    }
+    
+    .chat-messages {
+        background: #4a5568;
+    }
+    
+    .chat-user {
+        background: #718096;
+        color: #e2e8f0;
+    }
+}
