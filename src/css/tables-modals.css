@@ -111,7 +111,7 @@
 .progress-danger { background: var(--gradient-danger); }
 
 /* 🔍 모달 기본 스타일 */
-.modal {
+.modal, .manager-criteria-modal, .bridge-modal, .sms-modal {
     display: none;
     position: fixed;
     z-index: 2000;
@@ -124,13 +124,13 @@
     animation: modalFadeIn 0.3s ease;
 }
 
-.modal.show {
+.modal.show, .manager-criteria-modal.show, .bridge-modal.show, .sms-modal.show {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.modal-content {
+.modal-content, .manager-criteria-content, .bridge-modal-content, .sms-modal-content {
     background: var(--surface-color);
     border-radius: 20px;
     padding: 0;
@@ -145,7 +145,7 @@
 }
 
 /* 📋 모달 헤더 */
-.modal-header {
+.modal-header, .criteria-modal-header, .bridge-modal-header, .sms-modal-header {
     background: var(--gradient-primary);
     color: white;
     padding: 20px 25px;
@@ -155,7 +155,7 @@
     border-radius: 20px 20px 0 0;
 }
 
-.modal-title {
+.modal-title, .criteria-modal-title, .bridge-modal-title, .sms-modal-title {
     font-size: 1.3rem;
     font-weight: 700;
     margin: 0;
@@ -164,12 +164,7 @@
     gap: 10px;
 }
 
-.modal-title::before {
-    content: '📊';
-    font-size: 1.1rem;
-}
-
-.close {
+.close, .criteria-close, .bridge-close, .sms-close {
     background: rgba(255, 255, 255, 0.2);
     border: none;
     color: white;
@@ -185,68 +180,153 @@
     transition: all 0.3s ease;
 }
 
-.close:hover {
+.close:hover, .criteria-close:hover, .bridge-close:hover, .sms-close:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: rotate(90deg);
 }
 
-/* 📋 모달 바디 */
-.modal-body {
+/* 🎯 품질관리자 기준 모달 */
+.criteria-content {
     padding: 25px;
-    flex: 1;
+    max-height: 60vh;
     overflow-y: auto;
-    max-height: calc(90vh - 140px);
 }
 
-.modal-body::-webkit-scrollbar {
-    width: 6px;
+.criteria-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--surface-color), #f8f9fa);
 }
 
-.modal-body::-webkit-scrollbar-track {
-    background: var(--border-light);
-    border-radius: 3px;
+.criteria-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 8px;
 }
 
-.modal-body::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 3px;
+.criteria-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.modal-body::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-dark);
+.criteria-list li {
+    padding: 8px 0;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    border-bottom: 1px solid var(--border-light);
 }
 
-/* 🏗️ 교량 모달 특화 스타일 */
-.bridge-modal .modal-title::before { content: '🌉'; }
-.bridge-modal .modal-header { background: var(--gradient-primary); }
-
-/* 📱 SMS 모달 특화 스타일 */
-.sms-modal .modal-title::before { content: '📱'; }
-.sms-modal .modal-header { background: var(--gradient-success); }
-
-/* 👥 품질관리자 기준 모달 특화 스타일 */
-.quality-modal .modal-title::before { content: '👷‍♂️'; }
-.quality-modal .modal-header { background: var(--gradient-warning); }
-
-/* 📋 모달 내 폼 스타일 */
-.modal-form {
-    display: grid;
-    gap: 20px;
+.criteria-list li:last-child {
+    border-bottom: none;
 }
 
-.form-group {
+/* 🌉 교량 모달 */
+.bridge-filter-container {
+    padding: 20px 25px;
+    background: rgba(236, 240, 241, 0.3);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.bridge-filter-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
-.form-label {
+.bridge-filter-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.bridge-filter-select {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-color);
+    color: var(--text-color);
+    font-size: 0.8rem;
+    min-width: 100px;
+    cursor: pointer;
+}
+
+.bridge-filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-10);
+}
+
+.bridge-table-container {
+    padding: 25px;
+    overflow-x: auto;
+    max-height: 50vh;
+}
+
+.bridge-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.bridge-table th {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.bridge-table td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-color);
+}
+
+.bridge-table tbody tr:hover {
+    background: var(--primary-10);
+}
+
+.bridge-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* 📱 SMS 모달 */
+.sms-modal-header {
+    background: var(--gradient-success);
+}
+
+.sms-form-group {
+    margin-bottom: 20px;
+    padding: 0 25px;
+}
+
+.sms-form-group:first-child {
+    margin-top: 25px;
+}
+
+.sms-label {
+    display: block;
+    margin-bottom: 8px;
     font-weight: 600;
     color: var(--text-color);
     font-size: 0.9rem;
 }
 
-.form-input, .form-select, .form-textarea {
+.sms-input, .sms-textarea {
+    width: 100%;
     padding: 12px 15px;
     border: 2px solid var(--border-light);
     border-radius: 10px;
@@ -254,23 +334,28 @@
     transition: all 0.3s ease;
     background: var(--surface-color);
     color: var(--text-color);
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-20);
-    transform: translateY(-1px);
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 100px;
     font-family: inherit;
 }
 
-/* 🎛️ 모달 버튼 */
-.modal-actions {
+.sms-input:focus, .sms-textarea:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.sms-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.sms-char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+}
+
+.sms-buttons {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
@@ -279,7 +364,7 @@
     border-top: 1px solid var(--border-light);
 }
 
-.modal-btn {
+.sms-btn {
     padding: 12px 24px;
     border: none;
     border-radius: 25px;
@@ -290,68 +375,26 @@
     min-width: 100px;
 }
 
-.btn-primary {
-    background: var(--gradient-primary);
-    color: white;
-    box-shadow: 0 4px 15px var(--primary-20);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--primary-20);
-}
-
-.btn-success {
-    background: var(--gradient-success);
-    color: white;
-    box-shadow: 0 4px 15px var(--success-10);
-}
-
-.btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--success-10);
-}
-
-.btn-secondary {
+.sms-btn-cancel {
     background: var(--surface-color);
     color: var(--text-muted);
     border: 2px solid var(--border-color);
 }
 
-.btn-secondary:hover {
+.sms-btn-cancel:hover {
     background: var(--border-light);
     color: var(--text-color);
-    transform: translateY(-1px);
 }
 
-/* 📊 모달 내 통계 카드 */
-.modal-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin: 20px 0;
+.sms-btn-send {
+    background: var(--gradient-success);
+    color: white;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
 }
 
-.modal-stat-card {
-    background: linear-gradient(135deg, var(--surface-color), #f8f9fa);
-    border: 1px solid var(--border-light);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    border-left: 4px solid var(--primary-color);
-}
-
-.modal-stat-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    display: block;
-}
-
-.modal-stat-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-top: 5px;
+.sms-btn-send:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
 }
 
 /* 🎪 애니메이션 */
@@ -373,30 +416,32 @@
 
 /* 📱 반응형 모달 */
 @media (max-width: 768px) {
-    .modal-content {
+    .modal-content, .manager-criteria-content, .bridge-modal-content, .sms-modal-content {
         width: 95%;
         max-height: 95vh;
         margin: 10px;
     }
     
-    .modal-header, .modal-body, .modal-actions {
+    .modal-header, .criteria-modal-header, .bridge-modal-header, .sms-modal-header,
+    .criteria-content, .bridge-table-container, .sms-form-group, .sms-buttons {
         padding: 15px 20px;
     }
     
-    .modal-title {
+    .modal-title, .criteria-modal-title, .bridge-modal-title, .sms-modal-title {
         font-size: 1.1rem;
     }
     
-    .modal-actions {
+    .bridge-filter-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .sms-buttons {
         flex-direction: column;
     }
     
-    .modal-btn {
+    .sms-btn {
         width: 100%;
-    }
-    
-    .modal-stats {
-        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -424,26 +469,6 @@
     animation: spin 1s linear infinite;
 }
 
-/* 🎯 특수 테이블 스타일 */
-.compact-table {
-    font-size: 0.75rem;
-}
-
-.compact-table th,
-.compact-table td {
-    padding: 6px 4px;
-}
-
-.striped-table tbody tr:nth-child(even) {
-    background: rgba(236, 240, 241, 0.3);
-}
-
-.borderless-table {
-    border: none;
-    box-shadow: none;
-}
-
-.borderless-table th,
-.borderless-table td {
-    border: none;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
