@@ -94,6 +94,8 @@
                         <button class="filter-btn" data-region="호남권">호남권</button>
                         <button class="filter-btn" data-region="제주권">제주권</button>
                     </div>
+                    
+                    <!-- 구조물 테이블 -->
                     <div class="structure-status-table">
                         <table class="structure-table-horizontal">
                             <thead>
@@ -112,6 +114,26 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- 자재 테이블 (새로 추가!) -->
+                    <div class="material-status-table" style="margin-top: 15px;">
+                        <table class="structure-table-horizontal">
+                            <thead>
+                                <tr>
+                                    <th class="structure-header-horizontal">💧 상수관</th>
+                                    <th class="structure-header-horizontal">🚰 오수관</th>
+                                    <th class="structure-header-horizontal">🌧️ 우수관</th>
+                                    <th class="structure-header-horizontal">🛤️ 경계석</th>
+                                    <th class="structure-header-horizontal">📦 기타</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="material-data-row" id="material-data-row">
+                                    <!-- 동적으로 생성 -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- 3번: 품질관리자 배치기준 현황 -->
@@ -119,7 +141,7 @@
                     <div class="drag-indicator">⋮⋮</div>
                     <div class="section-header">
                         <h2 class="section-title">👷‍♂️ 품질관리자 배치기준 현황</h2>
-                        <button class="sms-button" onclick="showManagerCriteria()">📋 배치 기준</button>
+                        <button class="sms-button" onclick="event.stopPropagation(); window.dashboardModals.showManagerCriteria()">📋 배치 기준</button>
                     </div>
                     <div class="quality-manager-filter-buttons" id="quality-manager-filter-buttons">
                         <button class="filter-btn active" data-region="전국">전국</button>
