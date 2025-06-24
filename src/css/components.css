@@ -271,7 +271,7 @@
     opacity: 0.7;
 }
 
-/* 🌤️ 날씨 아이콘 및 툴팁 - 완전 수정! */
+/* 🌤️ 날씨 아이콘 및 툴팁 - 간단하고 확실한 방법! */
 .weather-icon {
     font-size: 1.2rem;
     margin-left: 8px;
@@ -280,47 +280,48 @@
     z-index: 1;
 }
 
-/* 🔥 개선된 툴팁 스타일 - 오른쪽 잘림 방지 */
+/* 🔥 툴팁을 왼쪽 정렬로 간단하게! */
 .weather-tooltip {
-    position: fixed; /* 뷰포트 기준으로 위치 계산 */
+    position: absolute;
+    top: -10px; /* 아이콘 위쪽으로 */
+    right: 100%; /* 아이콘 왼쪽으로 */
+    margin-right: 10px; /* 아이콘과 간격 */
     background: white;
     border: 2px solid var(--primary-color);
     border-radius: 12px;
     padding: 0;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-    z-index: 99999; /* 최고 우선순위 */
-    min-width: 240px;
-    max-width: 280px;
+    z-index: 99999;
+    width: 280px; /* 고정 너비 */
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px) scale(0.95);
+    transform: translateX(10px) scale(0.95);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: none;
-    /* 🎯 경계 조정을 위한 여백 확보 */
-    margin: 20px;
 }
 
 .weather-icon:hover .weather-tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateY(-10px) scale(1);
+    transform: translateX(0) scale(1);
 }
 
-/* 🎨 위치별 애니메이션 조정 */
-.tooltip-top .weather-tooltip {
-    transform-origin: bottom center;
-}
-
-.tooltip-bottom .weather-tooltip {
-    transform-origin: top center;
-}
-
-.tooltip-left-adjusted .weather-tooltip {
-    transform-origin: bottom left;
-}
-
-.tooltip-right-adjusted .weather-tooltip {
-    transform-origin: bottom right;
+/* 🎨 모바일에서는 위쪽으로 표시 */
+@media (max-width: 768px) {
+    .weather-tooltip {
+        top: auto;
+        bottom: 100%;
+        right: auto;
+        left: 50%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        transform: translateX(-50%) translateY(10px) scale(0.95);
+        width: 240px;
+    }
+    
+    .weather-icon:hover .weather-tooltip {
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
 }
 
 .tooltip-header {
@@ -497,9 +498,7 @@
     }
     
     .weather-tooltip {
-        min-width: 200px;
-        max-width: 240px;
-        margin: 15px;
+        width: 220px;
     }
 }
 
@@ -525,8 +524,6 @@
     }
     
     .weather-tooltip {
-        min-width: 180px;
-        max-width: 200px;
-        margin: 10px;
+        width: 200px;
     }
 }
