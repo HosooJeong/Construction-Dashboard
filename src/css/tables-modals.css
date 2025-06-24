@@ -1,4 +1,4 @@
-/* 테이블 및 모달 스타일 */
+/* 테이블 및 모달 스타일 - 통일된 컬러 시스템 */
 
 /* 공통 테이블 스타일 */
 .manager-table,
@@ -11,10 +11,10 @@
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background: white;
+    background: var(--surface-color);
 }
 
-/* 테이블 헤더 */
+/* 테이블 헤더 - 통일된 컬러 */
 .manager-header,
 .manager-header-horizontal,
 .structure-header-horizontal,
@@ -25,22 +25,13 @@
     font-weight: 600;
     font-size: 0.85rem;
     border: none;
-}
-
-.manager-header,
-.manager-header-horizontal {
-    background: linear-gradient(45deg, #8e44ad, #9b59b6);
+    background: var(--gradient-primary);
 }
 
 .structure-header-horizontal {
-    background: linear-gradient(45deg, #2c3e50, #34495e);
     padding: 15px 10px;
     font-size: 0.9rem;
     width: 20%;
-}
-
-.table-header {
-    background: linear-gradient(45deg, #34495e, #2c3e50);
 }
 
 /* 품질관리자 테이블 */
@@ -55,28 +46,29 @@
 }
 
 .manager-row:hover {
-    background: rgba(142, 68, 173, 0.1);
+    background: var(--primary-10);
     transform: translateY(-1px);
 }
 
+/* 등급별 행 스타일 - 통일된 상태 컬러 */
 .manager-row.special {
-    background: linear-gradient(90deg, rgba(231, 76, 60, 0.05), rgba(255, 255, 255, 1));
-    border-left: 4px solid #e74c3c;
+    background: linear-gradient(90deg, var(--danger-10), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--danger-color);
 }
 
 .manager-row.advanced {
-    background: linear-gradient(90deg, rgba(243, 156, 18, 0.05), rgba(255, 255, 255, 1));
-    border-left: 4px solid #f39c12;
+    background: linear-gradient(90deg, var(--warning-10), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--warning-color);
 }
 
 .manager-row.intermediate {
-    background: linear-gradient(90deg, rgba(52, 152, 219, 0.05), rgba(255, 255, 255, 1));
-    border-left: 4px solid #3498db;
+    background: linear-gradient(90deg, var(--primary-10), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--primary-color);
 }
 
 .manager-row.basic {
-    background: linear-gradient(90deg, rgba(39, 174, 96, 0.05), rgba(255, 255, 255, 1));
-    border-left: 4px solid #27ae60;
+    background: linear-gradient(90deg, var(--success-10), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--success-color);
 }
 
 .manager-cell,
@@ -84,16 +76,46 @@
     padding: 15px 10px;
     text-align: center;
     font-size: 0.85rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-light);
     vertical-align: middle;
 }
 
 .manager-cell-horizontal:first-child {
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-color);
     text-align: left;
     padding-left: 15px;
 }
+
+.manager-grade {
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.grade-icon {
+    font-size: 1.2rem;
+}
+
+.manager-count,
+.manager-count-horizontal {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+/* 등급별 컬러 - 통일된 상태 컬러 사용 */
+.manager-count-horizontal.special,
+.special .manager-grade { color: var(--danger-color); }
+.manager-count-horizontal.advanced,
+.advanced .manager-grade { color: var(--warning-color); }
+.manager-count-horizontal.intermediate,
+.intermediate .manager-grade { color: var(--primary-color); }
+.manager-count-horizontal.basic,
+.basic .manager-grade { color: var(--success-color); }
 
 /* 구조물 테이블 */
 .structure-status-table {
@@ -103,34 +125,95 @@
     gap: 15px;
 }
 
+.structure-data-row {
+    transition: all 0.3s ease;
+}
+
+.structure-data-row:hover {
+    background: var(--primary-10);
+}
+
 .structure-count-cell {
     padding: 20px 15px;
     text-align: center;
     font-weight: 700;
     font-size: 1.2rem;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f0f0;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-light);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .structure-count-cell:hover {
-    background: rgba(52, 152, 219, 0.1);
+    background: var(--primary-10);
     transform: translateY(-1px);
 }
 
 .structure-count-cell.bridge-clickable {
-    color: #e67e22;
+    color: var(--warning-color);
+    cursor: pointer;
 }
 
 .structure-count-cell.bridge-clickable:hover {
-    background: rgba(230, 126, 34, 0.1);
-    color: #d35400;
+    background: var(--warning-10);
+    color: var(--warning-color);
+}
+
+/* 품질통지서 테이블 */
+.notice-status-table {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.excellent-row {
+    background: linear-gradient(90deg, var(--success-10), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--success-color);
+}
+
+.poor-row {
+    background: linear-gradient(90deg, var(--danger-10), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--danger-color);
+}
+
+.notice-type {
+    padding: 12px 10px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.excellent-type { color: var(--success-color); }
+.poor-type { color: var(--danger-color); }
+
+.notice-icon {
+    font-size: 1rem;
+}
+
+.count-cell {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+}
+
+.excellent-count {
+    color: var(--success-color);
+    background: var(--success-10);
+}
+
+.poor-count {
+    color: var(--danger-color);
+    background: var(--danger-10);
 }
 
 /* 교량 테이블 */
 .bridge-table th {
-    background: linear-gradient(45deg, #e67e22, #f39c12);
+    background: var(--gradient-warning);
     color: white;
     padding: 12px 8px;
     text-align: center;
@@ -142,16 +225,16 @@
     padding: 10px 8px;
     text-align: center;
     font-size: 0.8rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-light);
 }
 
 .bridge-table tbody tr:hover {
-    background: rgba(230, 126, 34, 0.05);
+    background: var(--warning-10);
 }
 
 .bridge-name {
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-color);
     text-align: left !important;
 }
 
@@ -187,7 +270,7 @@
 .notice-modal-content,
 .bridge-modal-content,
 .sms-modal-content {
-    background: white;
+    background: var(--surface-color);
     border-radius: 15px;
     padding: 25px;
     width: 90%;
@@ -230,7 +313,7 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--border-light);
 }
 
 .criteria-modal-title,
@@ -239,7 +322,7 @@
 .sms-modal-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--text-color);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -253,7 +336,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #bbb;
+    color: var(--text-muted);
     transition: color 0.3s ease;
 }
 
@@ -261,10 +344,10 @@
 .notice-close:hover,
 .bridge-close:hover,
 .sms-close:hover {
-    color: #e74c3c;
+    color: var(--danger-color);
 }
 
-/* 날씨 관련 스타일 */
+/* 날씨 관련 스타일 - 상태 컬러 사용 */
 .weather-icon {
     position: absolute;
     right: 10px;
@@ -286,15 +369,16 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.weather-rain { background: rgba(52, 152, 219, 0.2); color: #3498db; }
-.weather-hot { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-.weather-cold { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
-.weather-wind { background: rgba(26, 188, 156, 0.2); color: #1abc9c; }
+/* 날씨 상태별 컬러 - 통일된 시스템 */
+.weather-rain { background: var(--primary-20); color: var(--primary-color); }
+.weather-hot { background: var(--danger-10); color: var(--danger-color); }
+.weather-cold { background: var(--primary-10); color: var(--primary-dark); }
+.weather-wind { background: var(--success-10); color: var(--success-color); }
 
 /* 날씨 툴팁 */
 .weather-tooltip {
     position: fixed;
-    background: white;
+    background: var(--surface-color);
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     padding: 15px;
@@ -304,7 +388,7 @@
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    border: 2px solid #f0f0f0;
+    border: 2px solid var(--border-light);
     pointer-events: none;
 }
 
@@ -328,16 +412,16 @@
 }
 
 .grid-item.drag-over {
-    border: 3px dashed #3498db;
-    background: rgba(52, 152, 219, 0.1);
+    border: 3px dashed var(--primary-color);
+    background: var(--primary-10);
 }
 
 .drag-indicator {
     position: absolute;
     top: 5px;
     right: 5px;
-    background: rgba(52, 152, 219, 0.8);
-    color: white;
+    background: var(--primary-20);
+    color: var(--primary-color);
     border-radius: 50%;
     width: 24px;
     height: 24px;
@@ -356,4 +440,6 @@
 
 .drag-indicator:hover {
     cursor: grabbing;
+    background: var(--primary-color);
+    color: white;
 }
