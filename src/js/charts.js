@@ -33,7 +33,7 @@ const qualityColors = {
     'poor': colorPalette.danger
 };
 
-// 🌤️ 툴팁 위치 계산 함수 추가
+// 🌤️ 개선된 툴팁 위치 계산 함수
 function setupWeatherTooltips() {
     const weatherIcons = document.querySelectorAll('.weather-icon');
     
@@ -44,48 +44,86 @@ function setupWeatherTooltips() {
         icon.addEventListener('mouseenter', function() {
             positionTooltip(this, tooltip);
         });
+        
+        // 마우스가 아이콘에서 벗어나면 툴팁 숨기기
+        icon.addEventListener('mouseleave', function() {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+        });
     });
 }
 
 function positionTooltip(iconElement, tooltip) {
-    const iconRect = iconElement.getBoundingClientRect();
-    const tooltipRect = tooltip.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    // 🔥 먼저 툴팁을 보여서 정확한 크기 측정
+    tooltip.style.opacity = '1';
+    tooltip.style.visibility = 'visible';
+    tooltip.style.transform = 'translateY(-10px) scale(1)';
     
-    // 기본 위치 (아이콘 위쪽)
-    let top = iconRect.top - tooltipRect.height - 10;
-    let left = iconRect.left + (iconRect.width / 2) - (tooltipRect.width / 2);
-    
-    // 🔧 오른쪽 경계 체크 및 조정
-    if (left + tooltipRect.width > viewportWidth - 20) {
-        left = viewportWidth - tooltipRect.width - 20; // 오른쪽 여백 20px
-        tooltip.classList.add('tooltip-right-adjusted');
-    } else {
-        tooltip.classList.remove('tooltip-right-adjusted');
-    }
-    
-    // 🔧 왼쪽 경계 체크 및 조정
-    if (left < 20) {
-        left = 20; // 왼쪽 여백 20px
-        tooltip.classList.add('tooltip-left-adjusted');
-    } else {
-        tooltip.classList.remove('tooltip-left-adjusted');
-    }
-    
-    // 🔧 위쪽 경계 체크 및 조정 (아이콘 아래로 이동)
-    if (top < 20) {
-        top = iconRect.bottom + 10;
-        tooltip.classList.add('tooltip-bottom');
-        tooltip.classList.remove('tooltip-top');
-    } else {
-        tooltip.classList.add('tooltip-top');
-        tooltip.classList.remove('tooltip-bottom');
-    }
-    
-    // 위치 적용
-    tooltip.style.top = top + 'px';
-    tooltip.style.left = left + 'px';
+    // 정확한 크기 계산을 위해 잠시 대기
+    setTimeout(() => {
+        const iconRect = iconElement.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // 툴팁 기본 크기 (CSS에서 정의된 값)
+        const tooltipWidth = 280; // max-width 기준
+        const tooltipHeight = tooltipRect.height || 150; // 대략적인 높이
+        
+        // 🎯 기본 위치 계산 (아이콘 위쪽 중앙)
+        let top = iconRect.top - tooltipHeight - 15;
+        let left = iconRect.left + (iconRect.width / 2) - (tooltipWidth / 2);
+        
+        // 🔧 오른쪽 경계 체크 및 조정
+        const rightOverflow = (left + tooltipWidth) - (viewportWidth - 20);
+        if (rightOverflow > 0) {
+            left = left - rightOverflow - 10; // 오른쪽 여백 추가
+            tooltip.classList.add('tooltip-right-adjusted');
+        } else {
+            tooltip.classList.remove('tooltip-right-adjusted');
+        }
+        
+        // 🔧 왼쪽 경계 체크 및 조정
+        if (left < 20) {
+            left = 20; // 왼쪽 최소 여백
+            tooltip.classList.add('tooltip-left-adjusted');
+        } else {
+            tooltip.classList.remove('tooltip-left-adjusted');
+        }
+        
+        // 🔧 위쪽 경계 체크 및 조정 (아이콘 아래로 이동)
+        if (top < 20) {
+            top = iconRect.bottom + 15; // 아이콘 아래쪽으로
+            tooltip.classList.add('tooltip-bottom');
+            tooltip.classList.remove('tooltip-top');
+        } else {
+            tooltip.classList.add('tooltip-top');
+            tooltip.classList.remove('tooltip-bottom');
+        }
+        
+        // 🔧 아래쪽 경계 체크
+        if (top + tooltipHeight > viewportHeight - 20) {
+            top = viewportHeight - tooltipHeight - 20;
+        }
+        
+        // ✨ 위치 적용
+        tooltip.style.top = Math.max(20, top) + 'px';
+        tooltip.style.left = Math.max(20, left) + 'px';
+        tooltip.style.width = Math.min(tooltipWidth, viewportWidth - 40) + 'px';
+        
+        // 🎯 디버깅 로그 (개발용 - 필요시 주석 해제)
+        // console.log('Tooltip positioned:', {
+        //     iconRect: iconRect,
+        //     calculated: { top, left },
+        //     viewport: { viewportWidth, viewportHeight },
+        //     final: { 
+        //         top: Math.max(20, top), 
+        //         left: Math.max(20, left),
+        //         width: Math.min(tooltipWidth, viewportWidth - 40)
+        //     }
+        // });
+        
+    }, 10); // 10ms 후에 위치 계산
 }
 
 // 품질 차트 렌더링
@@ -315,10 +353,10 @@ export function renderSiteList(containerId, sitesData, region = '전국') {
     
     container.innerHTML = html;
     
-    // 🔥 렌더링 후 날씨 툴팁 위치 설정
+    // 🔥 렌더링 후 날씨 툴팁 위치 설정 (약간의 지연을 두어 DOM이 완전히 렌더링되도록)
     setTimeout(() => {
         setupWeatherTooltips();
-    }, 100);
+    }, 150);
 }
 
 // 레미콘 요약 정보 업데이트
