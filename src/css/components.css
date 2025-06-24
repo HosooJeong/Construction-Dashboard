@@ -195,12 +195,14 @@
     color: var(--primary-color);
 }
 
-/* 🏗️ 현장 리스트 */
+/* 🏗️ 현장 리스트 - overflow 문제 해결! */
 .site-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: visible; /* 🔥 x축 오버플로우 허용으로 툴팁이 잘리지 않게! */
     max-height: 300px;
     padding-right: 5px;
+    position: relative; /* 상대 위치 지정 */
 }
 
 .site-list::-webkit-scrollbar {
@@ -228,11 +230,13 @@
     background: var(--surface-color);
     transition: all 0.3s ease;
     position: relative;
+    overflow: visible; /* 🔥 아이템 레벨에서도 오버플로우 허용! */
 }
 
 .site-item:hover {
     transform: translateX(5px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* 호버 시 상위로 올리기 */
 }
 
 .site-info {
@@ -267,61 +271,71 @@
     opacity: 0.7;
 }
 
-/* 🌤️ 날씨 아이콘 및 툴팁 - z-index 수정! */
+/* 🌤️ 날씨 아이콘 및 툴팁 - 완전 수정! */
 .weather-icon {
     font-size: 1.2rem;
     margin-left: 8px;
     position: relative;
     cursor: help;
-    z-index: 1; /* 기본 z-index 추가 */
+    z-index: 1;
 }
 
+/* 🔥 툴팁을 body에 직접 붙이는 방식으로 변경 */
 .weather-tooltip {
-    position: absolute;
-    bottom: 100%;
-    right: 0;
+    position: fixed; /* fixed로 변경하여 뷰포트 기준으로! */
     background: white;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* 그림자 강화 */
-    z-index: 9999; /* 🔥 높은 z-index로 수정! */
-    min-width: 220px; /* 너비 증가 */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    z-index: 99999; /* 매우 높은 z-index */
+    min-width: 240px;
+    max-width: 280px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(5px);
+    transform: translateY(10px) scale(0.95);
     transition: all 0.3s ease;
-    pointer-events: none; /* 마우스 이벤트 방지 */
+    pointer-events: none;
+    border: 2px solid var(--primary-color); /* 테두리 강조 */
 }
 
 .weather-icon:hover .weather-tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateY(-5px); /* 위로 더 올리기 */
+    transform: translateY(-10px) scale(1);
+}
+
+/* JavaScript로 위치를 동적으로 계산하도록 클래스 추가 */
+.tooltip-top {
+    transform-origin: bottom center;
+}
+
+.tooltip-bottom {
+    transform-origin: top center;
 }
 
 .tooltip-header {
-    padding: 10px 15px;
-    border-radius: 8px 8px 0 0;
+    padding: 12px 16px;
+    border-radius: 10px 10px 0 0;
     display: flex;
     align-items: center;
     gap: 8px;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: white;
 }
 
 .tooltip-content {
-    padding: 15px;
+    padding: 16px;
     background: white;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
 }
 
 .weather-data {
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
 .weather-label {
@@ -330,25 +344,30 @@
 }
 
 .weather-value {
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .quality-standard {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--border-light);
+    border-top: 2px solid var(--border-light);
 }
 
 .standard-title {
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 6px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    color: var(--primary-color);
 }
 
 .standard-text {
-    font-size: 0.8rem;
-    line-height: 1.4;
+    font-size: 0.85rem;
+    line-height: 1.5;
     color: var(--text-color);
+    background: rgba(52, 152, 219, 0.05);
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-color);
 }
 
 /* 🤖 챗봇 스타일 */
@@ -469,9 +488,8 @@
     }
     
     .weather-tooltip {
-        right: auto;
-        left: 0;
         min-width: 200px;
+        max-width: 240px;
     }
 }
 
@@ -496,15 +514,8 @@
         min-height: 120px;
     }
     
-    /* 모바일에서 툴팁 위치 조정 */
     .weather-tooltip {
-        left: auto;
-        right: 0;
         min-width: 180px;
-        transform: translateY(5px);
-    }
-    
-    .weather-icon:hover .weather-tooltip {
-        transform: translateY(-10px);
+        max-width: 200px;
     }
 }
