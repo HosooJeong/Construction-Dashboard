@@ -33,6 +33,73 @@ const qualityColors = {
     'poor': colorPalette.danger
 };
 
+// 🌤️ 툴팁 위치 계산 함수 - 영역 제한 완전 제거!
+function setupWeatherTooltips() {
+    const weatherIcons = document.querySelectorAll('.weather-icon');
+    
+    weatherIcons.forEach(icon => {
+        const tooltip = icon.querySelector('.weather-tooltip');
+        if (!tooltip) return;
+        
+        icon.addEventListener('mouseenter', function() {
+            showTooltip(this, tooltip);
+        });
+        
+        icon.addEventListener('mouseleave', function() {
+            hideTooltip(tooltip);
+        });
+    });
+}
+
+function showTooltip(iconElement, tooltip) {
+    const iconRect = iconElement.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // 툴팁 기본 크기
+    const tooltipWidth = 300;
+    const tooltipHeight = 200; // 대략적인 높이
+    
+    // 🎯 기본 위치: 아이콘 왼쪽 위
+    let left = iconRect.left - tooltipWidth - 15;
+    let top = iconRect.top - 10;
+    
+    // 🔧 왼쪽 경계 벗어나면 오른쪽으로
+    if (left < 20) {
+        left = iconRect.right + 15;
+    }
+    
+    // 🔧 오른쪽 경계 벗어나면 다시 왼쪽으로, 위치 조정
+    if (left + tooltipWidth > viewportWidth - 20) {
+        left = viewportWidth - tooltipWidth - 20;
+    }
+    
+    // 🔧 위쪽 경계 벗어나면 아래로
+    if (top < 20) {
+        top = iconRect.bottom + 10;
+    }
+    
+    // 🔧 아래쪽 경계 벗어나면 위로 조정
+    if (top + tooltipHeight > viewportHeight - 20) {
+        top = viewportHeight - tooltipHeight - 20;
+    }
+    
+    // 최종 위치 적용
+    tooltip.style.left = Math.max(20, left) + 'px';
+    tooltip.style.top = Math.max(20, top) + 'px';
+    
+    // 툴팁 표시
+    tooltip.style.opacity = '1';
+    tooltip.style.visibility = 'visible';
+    tooltip.style.transform = 'scale(1)';
+}
+
+function hideTooltip(tooltip) {
+    tooltip.style.opacity = '0';
+    tooltip.style.visibility = 'hidden';
+    tooltip.style.transform = 'scale(0.8)';
+}
+
 // 품질 차트 렌더링
 export function renderQualityChart(region = '전국') {
     const container = document.getElementById('quality-chart');
@@ -259,6 +326,11 @@ export function renderSiteList(containerId, sitesData, region = '전국') {
     }
     
     container.innerHTML = html;
+    
+    // 🔥 렌더링 후 날씨 툴팁 설정
+    setTimeout(() => {
+        setupWeatherTooltips();
+    }, 100);
 }
 
 // 레미콘 요약 정보 업데이트
@@ -398,4 +470,9 @@ export function initializeCharts() {
     renderSiteList('concrete-sites', concreteSites, '전국');
     renderSiteList('paving-sites', pavingSites, '전국');
     renderSiteList('compaction-sites', compactionSites);
+    
+    // 🔥 창 크기 변경 시 툴팁 재설정
+    window.addEventListener('resize', () => {
+        setupWeatherTooltips();
+    });
 }
