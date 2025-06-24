@@ -267,11 +267,13 @@
     opacity: 0.7;
 }
 
+/* 🌤️ 날씨 아이콘 및 툴팁 - z-index 수정! */
 .weather-icon {
     font-size: 1.2rem;
     margin-left: 8px;
     position: relative;
     cursor: help;
+    z-index: 1; /* 기본 z-index 추가 */
 }
 
 .weather-tooltip {
@@ -282,44 +284,49 @@
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-    min-width: 200px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* 그림자 강화 */
+    z-index: 9999; /* 🔥 높은 z-index로 수정! */
+    min-width: 220px; /* 너비 증가 */
     opacity: 0;
     visibility: hidden;
     transform: translateY(5px);
     transition: all 0.3s ease;
+    pointer-events: none; /* 마우스 이벤트 방지 */
 }
 
 .weather-icon:hover .weather-tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(-5px); /* 위로 더 올리기 */
 }
 
 .tooltip-header {
-    padding: 8px 12px;
+    padding: 10px 15px;
     border-radius: 8px 8px 0 0;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    color: white;
 }
 
 .tooltip-content {
-    padding: 12px;
+    padding: 15px;
+    background: white;
+    border-radius: 0 0 8px 8px;
 }
 
 .weather-data {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
 }
 
 .weather-label {
     font-weight: 500;
+    color: var(--text-muted);
 }
 
 .weather-value {
@@ -327,20 +334,21 @@
 }
 
 .quality-standard {
-    margin-top: 8px;
-    padding-top: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid var(--border-light);
 }
 
 .standard-title {
     font-weight: 600;
-    margin-bottom: 4px;
-    font-size: 0.8rem;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
 }
 
 .standard-text {
-    font-size: 0.75rem;
-    line-height: 1.3;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-color);
 }
 
 /* 🤖 챗봇 스타일 */
@@ -463,6 +471,7 @@
     .weather-tooltip {
         right: auto;
         left: 0;
+        min-width: 200px;
     }
 }
 
@@ -485,5 +494,17 @@
     .chat-messages {
         max-height: 200px;
         min-height: 120px;
+    }
+    
+    /* 모바일에서 툴팁 위치 조정 */
+    .weather-tooltip {
+        left: auto;
+        right: 0;
+        min-width: 180px;
+        transform: translateY(5px);
+    }
+    
+    .weather-icon:hover .weather-tooltip {
+        transform: translateY(-10px);
     }
 }
