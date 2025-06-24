@@ -33,6 +33,61 @@ const qualityColors = {
     'poor': colorPalette.danger
 };
 
+// 🌤️ 툴팁 위치 계산 함수 추가
+function setupWeatherTooltips() {
+    const weatherIcons = document.querySelectorAll('.weather-icon');
+    
+    weatherIcons.forEach(icon => {
+        const tooltip = icon.querySelector('.weather-tooltip');
+        if (!tooltip) return;
+        
+        icon.addEventListener('mouseenter', function() {
+            positionTooltip(this, tooltip);
+        });
+    });
+}
+
+function positionTooltip(iconElement, tooltip) {
+    const iconRect = iconElement.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // 기본 위치 (아이콘 위쪽)
+    let top = iconRect.top - tooltipRect.height - 10;
+    let left = iconRect.left + (iconRect.width / 2) - (tooltipRect.width / 2);
+    
+    // 🔧 오른쪽 경계 체크 및 조정
+    if (left + tooltipRect.width > viewportWidth - 20) {
+        left = viewportWidth - tooltipRect.width - 20; // 오른쪽 여백 20px
+        tooltip.classList.add('tooltip-right-adjusted');
+    } else {
+        tooltip.classList.remove('tooltip-right-adjusted');
+    }
+    
+    // 🔧 왼쪽 경계 체크 및 조정
+    if (left < 20) {
+        left = 20; // 왼쪽 여백 20px
+        tooltip.classList.add('tooltip-left-adjusted');
+    } else {
+        tooltip.classList.remove('tooltip-left-adjusted');
+    }
+    
+    // 🔧 위쪽 경계 체크 및 조정 (아이콘 아래로 이동)
+    if (top < 20) {
+        top = iconRect.bottom + 10;
+        tooltip.classList.add('tooltip-bottom');
+        tooltip.classList.remove('tooltip-top');
+    } else {
+        tooltip.classList.add('tooltip-top');
+        tooltip.classList.remove('tooltip-bottom');
+    }
+    
+    // 위치 적용
+    tooltip.style.top = top + 'px';
+    tooltip.style.left = left + 'px';
+}
+
 // 품질 차트 렌더링
 export function renderQualityChart(region = '전국') {
     const container = document.getElementById('quality-chart');
@@ -259,6 +314,11 @@ export function renderSiteList(containerId, sitesData, region = '전국') {
     }
     
     container.innerHTML = html;
+    
+    // 🔥 렌더링 후 날씨 툴팁 위치 설정
+    setTimeout(() => {
+        setupWeatherTooltips();
+    }, 100);
 }
 
 // 레미콘 요약 정보 업데이트
@@ -398,4 +458,9 @@ export function initializeCharts() {
     renderSiteList('concrete-sites', concreteSites, '전국');
     renderSiteList('paving-sites', pavingSites, '전국');
     renderSiteList('compaction-sites', compactionSites);
+    
+    // 🔥 창 크기 변경 시 툴팁 위치 재계산
+    window.addEventListener('resize', () => {
+        setupWeatherTooltips();
+    });
 }
