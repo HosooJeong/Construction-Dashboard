@@ -1,4 +1,43 @@
-/* 기본 스타일 및 전역 설정 */
+/* 통일된 컬러 시스템 및 기본 스타일 */
+
+/* 🎨 메인 컬러 팔레트 - 통일감 있는 5가지 색상만 사용 */
+:root {
+    /* 메인 컬러 (블루 계열) */
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --primary-light: #5dade2;
+    
+    /* 보조 컬러 (회색 계열) */
+    --secondary-color: #2c3e50;
+    --secondary-light: #34495e;
+    --text-color: #2c3e50;
+    --text-muted: #7f8c8d;
+    
+    /* 상태 컬러 (의미별) */
+    --success-color: #27ae60;     /* 성공/우수 - 녹색 */
+    --warning-color: #f39c12;     /* 경고/주의 - 오렌지 */
+    --danger-color: #e74c3c;      /* 위험/불량 - 빨강 */
+    
+    /* 중성 컬러 */
+    --background-color: #ecf0f1;
+    --surface-color: #ffffff;
+    --border-color: #bdc3c7;
+    --border-light: #e8eaed;
+    
+    /* 그라데이션 */
+    --gradient-primary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    --gradient-success: linear-gradient(45deg, var(--success-color), #2ecc71);
+    --gradient-warning: linear-gradient(45deg, var(--warning-color), #f4d03f);
+    --gradient-danger: linear-gradient(45deg, var(--danger-color), #ec7063);
+    
+    /* 투명도 */
+    --primary-10: rgba(52, 152, 219, 0.1);
+    --primary-20: rgba(52, 152, 219, 0.2);
+    --success-10: rgba(39, 174, 96, 0.1);
+    --warning-10: rgba(243, 156, 18, 0.1);
+    --danger-10: rgba(231, 76, 60, 0.1);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +46,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    background: var(--gradient-primary);
     min-height: 100vh;
     padding: 10px;
 }
@@ -33,11 +72,11 @@ body {
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--border-light);
 }
 
 .header h1 {
-    color: #2c3e50;
+    color: var(--text-color);
     font-size: 1.8rem;
     font-weight: 700;
 }
@@ -52,7 +91,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #2c3e50, #3498db);
+    background: var(--gradient-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,13 +106,13 @@ body {
 
 .user-name {
     font-weight: 600;
-    color: #333;
+    color: var(--text-color);
     font-size: 0.9rem;
 }
 
 .user-role {
     font-size: 0.75rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 /* 메인 그리드 레이아웃 */
@@ -104,7 +143,7 @@ body {
 }
 
 .grid-item {
-    background: white;
+    background: var(--surface-color);
     border-radius: 15px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     padding: 20px;
@@ -121,24 +160,24 @@ body {
 .empty-slot {
     background: transparent;
     box-shadow: none;
-    border: 2px dashed #e0e0e0;
+    border: 2px dashed var(--border-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #bbb;
+    color: var(--text-muted);
     font-size: 1rem;
 }
 
 .empty-slot:hover {
     transform: none;
     box-shadow: none;
-    border-color: #ccc;
+    border-color: var(--border-color);
 }
 
 .section-title {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-color);
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -157,7 +196,7 @@ body {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: linear-gradient(45deg, #2c3e50, #3498db);
+    background: var(--gradient-primary);
     color: white;
     padding: 12px 16px;
     border-radius: 8px;
@@ -167,13 +206,13 @@ body {
     max-width: 280px;
 }
 
-/* 공통 버튼 스타일 */
-.filter-btn {
+/* 공통 버튼 스타일 - 모든 버튼이 동일한 컬러 시스템 사용 */
+.filter-btn, .sms-button {
     padding: 6px 12px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--border-color);
     border-radius: 15px;
-    background: white;
-    color: #666;
+    background: var(--surface-color);
+    color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
@@ -181,20 +220,39 @@ body {
     white-space: nowrap;
 }
 
-.filter-btn:hover {
-    border-color: #3498db;
-    color: #3498db;
+.filter-btn:hover, .sms-button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
     transform: translateY(-1px);
 }
 
 .filter-btn.active {
-    background: linear-gradient(45deg, #3498db, #2980b9);
+    background: var(--gradient-primary);
     color: white;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     font-weight: 600;
 }
 
 .filter-btn.active:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 4px 12px var(--primary-20);
+}
+
+/* SMS 버튼 - 성공 색상 사용 */
+.sms-button {
+    background: var(--gradient-success);
+    color: white;
+    border-color: var(--success-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px var(--success-10);
+}
+
+.sms-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+    border-color: var(--success-color);
+    color: white;
 }
