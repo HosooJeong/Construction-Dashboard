@@ -1,7 +1,40 @@
 // 메인 애플리케이션 모듈
 import { initializeCharts, setupFilterButtons } from './charts.js';
 import { modalManager } from './modals.js';
-import { showAlert, setupDragAndDrop, chatBot } from './utils.js';
+import { showAlert, setupDragAndDrop, chatBot, toggleWorkFilter, searchWork } from './utils.js';
+
+// 🚀 즉시 전역 함수 등록 (DOM 로드 전에 실행)
+function registerGlobalFunctions() {
+    // 모달 관련 함수들
+    window.showManagerCriteria = () => modalManager.showManagerCriteria();
+    window.hideManagerCriteria = () => modalManager.hideManagerCriteria();
+    
+    // 유틸리티 함수들
+    window.toggleWorkFilter = toggleWorkFilter;
+    window.searchWork = searchWork;
+    
+    // 전역 객체들
+    window.dashboardModals = {
+        showManagerCriteria: () => modalManager.showManagerCriteria(),
+        hideManagerCriteria: () => modalManager.hideManagerCriteria(),
+        showBridgeModal: () => modalManager.showBridgeModal(),
+        hideBridgeModal: () => modalManager.hideBridgeModal(),
+        showSMSModal: () => modalManager.showSMSModal(),
+        hideSMSModal: () => modalManager.hideSMSModal(),
+        filterBridges: () => modalManager.filterBridges(),
+        sendSMS: () => modalManager.sendSMS()
+    };
+    
+    window.dashboardUtils = {
+        showAlert: showAlert,
+        setupDragAndDrop: setupDragAndDrop
+    };
+    
+    console.log('✅ 전역 함수 등록 완료');
+}
+
+// 즉시 전역 함수 등록
+registerGlobalFunctions();
 
 // 메인 대시보드 애플리케이션 클래스
 class Dashboard {
@@ -35,8 +68,13 @@ class Dashboard {
             // SMS 버튼 이벤트 설정
             this.setupSMSButtons();
             
-            // 전역 객체에 모듈들 등록 (HTML에서 접근용)
-            this.registerGlobalObjects();
+            // 차트 관련 전역 객체 추가
+            window.dashboardCharts = {
+                setupFilterButtons: setupFilterButtons
+            };
+            
+            // 메인 대시보드 인스턴스
+            window.dashboard = this;
             
             this.isInitialized = true;
             
@@ -60,37 +98,6 @@ class Dashboard {
                 });
             }
         });
-    }
-    
-    // 전역 객체 등록
-    registerGlobalObjects() {
-        // 모달 관련
-        window.dashboardModals = {
-            showManagerCriteria: () => modalManager.showManagerCriteria(),
-            hideManagerCriteria: () => modalManager.hideManagerCriteria(),
-            showBridgeModal: () => modalManager.showBridgeModal(),
-            hideBridgeModal: () => modalManager.hideBridgeModal(),
-            showSMSModal: () => modalManager.showSMSModal(),
-            hideSMSModal: () => modalManager.hideSMSModal(),
-            filterBridges: () => modalManager.filterBridges(),
-            sendSMS: () => modalManager.sendSMS()
-        };
-        
-        // 유틸리티 관련
-        window.dashboardUtils = {
-            showAlert: showAlert,
-            setupDragAndDrop: setupDragAndDrop
-        };
-        
-        // 차트 관련
-        window.dashboardCharts = {
-            setupFilterButtons: setupFilterButtons
-        };
-        
-        // 메인 대시보드 인스턴스
-        window.dashboard = this;
-        
-        console.log('📝 전역 객체 등록 완료');
     }
     
     // 대시보드 재시작
@@ -121,10 +128,6 @@ const dashboard = new Dashboard();
 if (typeof window !== 'undefined') {
     // 브라우저 환경에서만 실행
     dashboard.init();
-    
-    // 디버깅용 전역 함수들
-    window.showManagerCriteria = () => modalManager.showManagerCriteria();
-    window.hideManagerCriteria = () => modalManager.hideManagerCriteria();
     
     // 페이지 새로고침 시에도 상태 유지
     window.addEventListener('beforeunload', () => {
