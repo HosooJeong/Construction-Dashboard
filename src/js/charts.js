@@ -2,6 +2,7 @@
 import { 
     qualityData, 
     structureData, 
+    materialData,
     qualityManagerData,
     concreteSites,
     pavingSites,
@@ -33,32 +34,76 @@ const qualityColors = {
     'poor': colorPalette.danger
 };
 
-// 🌤️ 툴팁 위치 계산 함수 - 영역 제한 완전 제거!
-function setupWeatherTooltips() {
-    const weatherIcons = document.querySelectorAll('.weather-icon');
+// 🌤️ 동적 툴팁 관리
+let currentTooltip = null;
+
+function createWeatherTooltip(weatherData, weather) {
+    // 기존 툴팁 제거
+    removeWeatherTooltip();
     
-    weatherIcons.forEach(icon => {
-        const tooltip = icon.querySelector('.weather-tooltip');
-        if (!tooltip) return;
-        
-        icon.addEventListener('mouseenter', function() {
-            showTooltip(this, tooltip);
-        });
-        
-        icon.addEventListener('mouseleave', function() {
-            hideTooltip(tooltip);
-        });
-    });
+    const statusColor = weatherData.status === 'critical' ? colorPalette.danger : colorPalette.success;
+    const weatherColor = getWeatherColor(weather);
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'weather-tooltip-dynamic';
+    tooltip.innerHTML = `
+        <div class="tooltip-header" style="background: ${weatherColor}; color: white;">
+            <span class="tooltip-icon">${getWeatherIcon(weather)}</span>
+            <span class="tooltip-title">${getWeatherTitle(weather)}</span>
+        </div>
+        <div class="tooltip-content">
+            <div class="weather-data">
+                <span class="weather-label" style="color: ${colorPalette.muted};">현재</span>
+                <span class="weather-value" style="color: ${statusColor}; font-weight: 600;">
+                    ${weatherData.current}${weatherData.unit}
+                </span>
+            </div>
+            <div class="weather-data">
+                <span class="weather-label" style="color: ${colorPalette.muted};">예보</span>
+                <span class="weather-value" style="color: ${colorPalette.secondary};">${weatherData.forecast}</span>
+            </div>
+            <div class="quality-standard">
+                <div class="standard-title" style="color: ${colorPalette.primary}; font-weight: 600;">품질관리기준</div>
+                <div class="standard-text" style="color: ${colorPalette.secondary};">${weatherData.standard}</div>
+            </div>
+        </div>
+    `;
+    
+    // 동적 스타일 적용
+    tooltip.style.cssText = `
+        position: fixed !important;
+        background: white;
+        border: 2px solid ${colorPalette.primary};
+        border-radius: 12px;
+        padding: 0;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        z-index: 999999 !important;
+        width: 300px;
+        max-width: 90vw;
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.8);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
+        max-height: 80vh;
+        overflow-y: auto;
+    `;
+    
+    document.body.appendChild(tooltip);
+    currentTooltip = tooltip;
+    
+    return tooltip;
 }
 
-function showTooltip(iconElement, tooltip) {
+function showWeatherTooltip(iconElement, weatherData, weather) {
+    const tooltip = createWeatherTooltip(weatherData, weather);
     const iconRect = iconElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
     // 툴팁 기본 크기
     const tooltipWidth = 300;
-    const tooltipHeight = 200; // 대략적인 높이
+    const tooltipHeight = 200;
     
     // 🎯 기본 위치: 아이콘 왼쪽 위
     let left = iconRect.left - tooltipWidth - 15;
@@ -88,19 +133,49 @@ function showTooltip(iconElement, tooltip) {
     tooltip.style.left = Math.max(20, left) + 'px';
     tooltip.style.top = Math.max(20, top) + 'px';
     
-    // 툴팁 표시
-    tooltip.style.opacity = '1';
-    tooltip.style.visibility = 'visible';
-    tooltip.style.transform = 'scale(1)';
+    // 툴팁 표시 (약간의 지연으로 애니메이션 효과)
+    setTimeout(() => {
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
+        tooltip.style.transform = 'scale(1)';
+    }, 10);
 }
 
-function hideTooltip(tooltip) {
-    tooltip.style.opacity = '0';
-    tooltip.style.visibility = 'hidden';
-    tooltip.style.transform = 'scale(0.8)';
+function removeWeatherTooltip() {
+    if (currentTooltip) {
+        currentTooltip.style.opacity = '0';
+        currentTooltip.style.visibility = 'hidden';
+        currentTooltip.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            if (currentTooltip && currentTooltip.parentNode) {
+                currentTooltip.parentNode.removeChild(currentTooltip);
+            }
+            currentTooltip = null;
+        }, 300);
+    }
 }
 
-// 품질 차트 렌더링
+function setupWeatherTooltips() {
+    const weatherIcons = document.querySelectorAll('.weather-icon');
+    
+    weatherIcons.forEach(icon => {
+        const weatherData = icon.dataset.weatherData ? JSON.parse(icon.dataset.weatherData) : null;
+        const weather = icon.dataset.weather;
+        
+        if (!weatherData || !weather) return;
+        
+        icon.addEventListener('mouseenter', function() {
+            showWeatherTooltip(this, weatherData, weather);
+        });
+        
+        icon.addEventListener('mouseleave', function() {
+            removeWeatherTooltip();
+        });
+    });
+}
+
+// 🍕 품질 차트를 원형 차트로 렌더링
 export function renderQualityChart(region = '전국') {
     const container = document.getElementById('quality-chart');
     if (!container) return;
@@ -108,7 +183,50 @@ export function renderQualityChart(region = '전국') {
     const data = qualityData[region] || qualityData['전국'];
     const total = data.reduce((sum, item) => sum + item.count, 0);
     
-    let html = '<div class="quality-chart-container">';
+    // SVG 원형 차트 생성
+    let html = `
+        <div class="quality-chart-container">
+            <div class="pie-chart-wrapper">
+                <svg class="pie-chart" width="200" height="200" viewBox="0 0 42 42">
+                    <circle class="pie-background" cx="21" cy="21" r="15.915" fill="transparent" stroke="${colorPalette.light}" stroke-width="3"></circle>
+    `;
+    
+    let cumulativePercentage = 0;
+    
+    for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        const percentage = total > 0 ? (item.count / total) * 100 : 0;
+        const color = qualityColors[item.color] || colorPalette.muted;
+        
+        if (percentage > 0) {
+            const strokeDasharray = `${percentage} ${100 - percentage}`;
+            const strokeDashoffset = 25 - cumulativePercentage;
+            
+            html += `
+                <circle class="pie-segment" 
+                        cx="21" cy="21" r="15.915" 
+                        fill="transparent" 
+                        stroke="${color}" 
+                        stroke-width="3" 
+                        stroke-dasharray="${strokeDasharray}" 
+                        stroke-dashoffset="${strokeDashoffset}"
+                        opacity="0.8">
+                </circle>
+            `;
+            
+            cumulativePercentage += percentage;
+        }
+    }
+    
+    html += `
+                </svg>
+                <div class="pie-center-text">
+                    <div class="pie-total-count">${total}</div>
+                    <div class="pie-total-label">개소</div>
+                </div>
+            </div>
+            <div class="pie-legend">
+    `;
     
     for (let i = 0; i < data.length; i++) {
         const item = data[i];
@@ -116,25 +234,19 @@ export function renderQualityChart(region = '전국') {
         const color = qualityColors[item.color] || colorPalette.muted;
         
         html += `
-            <div class="quality-bar">
-                <div class="quality-label" style="color: ${color};">
-                    <span class="quality-icon">●</span>
-                    ${item.label}
-                </div>
-                <div class="bar-container">
-                    <div class="bar-fill" 
-                         style="width: ${percentage}%; background: linear-gradient(135deg, ${color}, ${color}dd);">
-                        <span class="bar-percentage">${percentage}%</span>
-                    </div>
-                </div>
-                <div class="quality-count" style="color: ${color}; font-weight: 600;">
-                    ${item.count}건
-                </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: ${color};"></span>
+                <span class="legend-label">${item.label}</span>
+                <span class="legend-value">${item.count}개 (${percentage}%)</span>
             </div>
         `;
     }
     
-    html += '</div>';
+    html += `
+            </div>
+        </div>
+    `;
+    
     container.innerHTML = html;
 }
 
@@ -153,9 +265,31 @@ export function renderStructureTable(region = '전국') {
         const count = structureInfo ? structureInfo.count : 0;
         const isClickable = structureName === '교량';
         
-        html += `<td class="structure-count-cell${isClickable ? ' bridge-clickable' : ''}"${
+        html += `<td class="structure-count-cell${isClickable ? ' bridge-clickable' : ''}\"${
             isClickable ? ' onclick="window.dashboardModals.showBridgeModal()"' : ''
         } style="color: ${colorPalette.primary}; font-weight: 600;">`;
+        html += count + '개소';
+        html += '</td>';
+    }
+    
+    container.innerHTML = html;
+}
+
+// 자재 테이블 렌더링 (새로 추가!)
+export function renderMaterialTable(region = '전국') {
+    const container = document.getElementById('material-data-row');
+    if (!container) return;
+    
+    const data = materialData[region] || materialData['전국'];
+    const materialOrder = ['상수관', '오수관', '우수관', '경계석', '기타'];
+    
+    let html = '';
+    for (let i = 0; i < materialOrder.length; i++) {
+        const materialName = materialOrder[i];
+        const materialInfo = data.find(item => item.type === materialName);
+        const count = materialInfo ? materialInfo.count : 0;
+        
+        html += `<td class="structure-count-cell" style="color: ${colorPalette.success}; font-weight: 600;">`;
         html += count + '개소';
         html += '</td>';
     }
@@ -271,47 +405,15 @@ export function renderSiteList(containerId, sitesData, region = '전국') {
             html += '</div>';
         }
         
-        // 날씨 아이콘
-        if (site.weather) {
-            const weatherColors = {
-                'rain': colorPalette.primary,
-                'hot': colorPalette.danger,
-                'cold': colorPalette.primary,
-                'wind': colorPalette.warning
-            };
+        // 날씨 아이콘 (동적 데이터 저장)
+        if (site.weather && site.weatherData) {
+            const weatherColor = getWeatherColor(site.weather);
             
-            const weatherColor = weatherColors[site.weather] || colorPalette.muted;
-            
-            html += `<div class="weather-icon weather-${site.weather}" style="color: ${weatherColor};">`;
+            html += `<div class="weather-icon weather-${site.weather}" 
+                           style="color: ${weatherColor};" 
+                           data-weather="${site.weather}"
+                           data-weather-data='${JSON.stringify(site.weatherData)}'>`;
             html += getWeatherIcon(site.weather);
-            
-            if (site.weatherData) {
-                const statusColor = site.weatherData.status === 'critical' ? colorPalette.danger : colorPalette.success;
-                
-                html += '<div class="weather-tooltip">';
-                html += `<div class="tooltip-header" style="background: ${weatherColor}; color: white;">`;
-                html += '<span class="tooltip-icon">' + getWeatherIcon(site.weather) + '</span>';
-                html += '<span class="tooltip-title">' + getWeatherTitle(site.weather) + '</span>';
-                html += '</div>';
-                html += '<div class="tooltip-content">';
-                html += '<div class="weather-data">';
-                html += `<span class="weather-label" style="color: ${colorPalette.muted};">현재</span>`;
-                html += `<span class="weather-value" style="color: ${statusColor}; font-weight: 600;">`;
-                html += site.weatherData.current + site.weatherData.unit;
-                html += '</span>';
-                html += '</div>';
-                html += '<div class="weather-data">';
-                html += `<span class="weather-label" style="color: ${colorPalette.muted};">예보</span>`;
-                html += `<span class="weather-value" style="color: ${colorPalette.secondary};">${site.weatherData.forecast}</span>`;
-                html += '</div>';
-                html += '<div class="quality-standard">';
-                html += `<div class="standard-title" style="color: ${colorPalette.primary}; font-weight: 600;">품질관리기준</div>`;
-                html += `<div class="standard-text" style="color: ${colorPalette.secondary};">${site.weatherData.standard}</div>`;
-                html += '</div>';
-                html += '</div>';
-                html += '</div>';
-            }
-            
             html += '</div>';
         }
         
@@ -389,6 +491,17 @@ function getWeatherTitle(weather) {
     return titles[weather] || '날씨 정보';
 }
 
+// 날씨별 색상 반환
+function getWeatherColor(weather) {
+    const colors = {
+        'rain': colorPalette.primary,
+        'hot': colorPalette.danger,
+        'cold': colorPalette.primary,
+        'wind': colorPalette.warning
+    };
+    return colors[weather] || colorPalette.muted;
+}
+
 // 필터 버튼 이벤트 설정
 export function setupFilterButtons() {
     // 품질 차트 필터
@@ -415,6 +528,7 @@ export function setupFilterButtons() {
             this.classList.add('active');
             
             renderStructureTable(region);
+            renderMaterialTable(region); // 자재 테이블도 같이 업데이트
             window.dashboardUtils.showAlert(region + ' 구조물 현황으로 변경되었습니다! 🏗️');
         });
     });
@@ -466,6 +580,7 @@ export function setupFilterButtons() {
 export function initializeCharts() {
     renderQualityChart('전국');
     renderStructureTable('전국');
+    renderMaterialTable('전국'); // 자재 테이블 초기화
     renderManagerTable('전국');
     renderSiteList('concrete-sites', concreteSites, '전국');
     renderSiteList('paving-sites', pavingSites, '전국');
@@ -473,6 +588,6 @@ export function initializeCharts() {
     
     // 🔥 창 크기 변경 시 툴팁 재설정
     window.addEventListener('resize', () => {
-        setupWeatherTooltips();
+        removeWeatherTooltip(); // 기존 툴팁 제거
     });
 }
