@@ -1,262 +1,520 @@
-/* 반응형 디자인 */
+/* 반응형 디자인 - 통일된 컬러 시스템 적용 */
 
-/* 모바일 및 태블릿 */
-@media (max-width: 1200px) {
+/* 🖥️ 데스크탑 (1440px+) */
+@media (min-width: 1440px) {
+    .dashboard-container {
+        max-width: 2400px;
+        padding: 25px;
+    }
+    
     .main-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .left-column, .center-column, .right-column {
-        grid-template-rows: auto;
-        grid-template-columns: 1fr;
-    }
-    
-    .work-checkbox-group {
-        justify-content: center;
-    }
-    
-    .work-filter-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .summary-stats {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .stat-item {
-        flex-direction: row;
-        justify-content: space-between;
-        width: 100%;
-    }
-    
-    .table-header, .count-cell, .notice-type {
-        font-size: 0.75rem;
-        padding: 8px 6px;
-    }
-    
-    .bridge-filter-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-
-/* 대형 화면 최적화 */
-@media (min-width: 1200px) {
-    .header h1 {
-        font-size: 2.2rem;
-    }
-    
-    .section-title {
-        font-size: 1.3rem;
+        gap: 20px;
     }
     
     .grid-item {
         padding: 25px;
     }
     
-    .site-item {
-        min-height: 70px;
-        gap: 20px;
+    .header h1 {
+        font-size: 2rem;
     }
     
-    .site-name {
-        font-size: 0.9rem;
+    .chart-container {
+        width: 350px;
+        height: 350px;
     }
     
-    .chat-messages {
-        min-height: 450px;
+    .chart-percentage {
+        font-size: 3rem;
+    }
+    
+    .stat-value {
+        font-size: 3rem;
     }
 }
 
-/* 초대형 화면 (1440px+) */
-@media (min-width: 1440px) {
-    .header h1 {
-        font-size: 2.5rem;
-    }
-    
-    .section-title {
-        font-size: 1.4rem;
-    }
-    
-    .grid-item {
-        padding: 30px;
-    }
-    
-    .manager-cell,
-    .manager-cell-horizontal {
-        padding: 18px 12px;
-        font-size: 0.9rem;
-    }
-    
-    .structure-count-cell {
-        padding: 25px 18px;
-        font-size: 1.3rem;
-    }
-    
-    .summary-value {
-        font-size: 1.3rem;
-    }
-}
-
-/* 4K 화면 (1920px+) */
-@media (min-width: 1920px) {
-    .header h1 {
-        font-size: 2.8rem;
-    }
-    
-    .section-title {
-        font-size: 1.5rem;
-    }
-    
+/* 💻 노트북 (1024px - 1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
     .dashboard-container {
-        padding: 30px;
-    }
-    
-    .grid-item {
-        padding: 35px;
-        border-radius: 20px;
+        padding: 20px;
     }
     
     .main-grid {
-        gap: 20px;
+        gap: 15px;
+    }
+    
+    .chart-container {
+        width: 280px;
+        height: 280px;
+    }
+    
+    .chart-percentage {
+        font-size: 2.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+    }
+}
+
+/* 📱 태블릿 (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+    body {
+        padding: 8px;
+    }
+    
+    .dashboard-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .main-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        gap: 12px;
+        height: auto;
     }
     
     .left-column,
     .center-column,
     .right-column {
-        gap: 20px;
+        display: contents;
+    }
+    
+    .grid-item {
+        padding: 15px;
+        min-height: 200px;
+    }
+    
+    .chart-container {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .chart-percentage {
+        font-size: 2rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .filter-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .filter-section {
+        justify-content: center;
+    }
+    
+    /* 테이블 반응형 */
+    .data-table {
+        font-size: 0.75rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 4px;
+    }
+    
+    /* 모달 조정 */
+    .modal-content {
+        width: 95%;
+        margin: 20px 10px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-title {
+        font-size: 1.2rem;
+    }
+    
+    .modal-stats {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
-/* 프린트 최적화 */
+/* 📱 모바일 (480px - 767px) */
+@media (max-width: 767px) and (min-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    .dashboard-container {
+        padding: 12px;
+        border-radius: 12px;
+        min-height: calc(100vh - 10px);
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    
+    .header h1 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .main-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        height: auto;
+    }
+    
+    .left-column,
+    .center-column,
+    .right-column {
+        display: contents;
+    }
+    
+    .grid-item {
+        padding: 12px;
+        min-height: 180px;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    
+    .chart-container {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .chart-percentage {
+        font-size: 1.8rem;
+    }
+    
+    .chart-label {
+        font-size: 0.9rem;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .status-grid,
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .status-card,
+    .stat-card {
+        padding: 12px;
+    }
+    
+    .filter-container {
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+    }
+    
+    .filter-section {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+    
+    /* 날씨 위젯 모바일 */
+    .weather-widget {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .weather-icon {
+        font-size: 1.5rem;
+    }
+    
+    .weather-temp {
+        font-size: 1.2rem;
+    }
+    
+    .weather-desc {
+        font-size: 0.7rem;
+    }
+    
+    /* 테이블 모바일 최적화 */
+    .data-table {
+        font-size: 0.7rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 6px 3px;
+    }
+    
+    /* 가로 스크롤 테이블 */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-responsive::-webkit-scrollbar {
+        height: 3px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--border-light);
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+    
+    /* 모달 모바일 */
+    .modal-content {
+        width: 98%;
+        max-height: 95vh;
+        margin: 2% 1%;
+        border-radius: 15px;
+    }
+    
+    .modal-header {
+        padding: 12px 15px;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .modal-title {
+        font-size: 1rem;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-actions {
+        padding: 12px 15px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .modal-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+    
+    .modal-stats {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .modal-stat-card {
+        padding: 10px;
+    }
+    
+    .modal-stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* 📱 소형 모바일 (479px 이하) */
+@media (max-width: 479px) {
+    body {
+        padding: 3px;
+    }
+    
+    .dashboard-container {
+        padding: 8px;
+        border-radius: 8px;
+        min-height: calc(100vh - 6px);
+    }
+    
+    .header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .user-name {
+        font-size: 0.8rem;
+    }
+    
+    .user-role {
+        font-size: 0.7rem;
+    }
+    
+    .main-grid {
+        gap: 8px;
+    }
+    
+    .grid-item {
+        padding: 10px;
+        min-height: 150px;
+    }
+    
+    .section-title {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+    
+    .chart-container {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .chart-percentage {
+        font-size: 1.5rem;
+    }
+    
+    .chart-label {
+        font-size: 0.8rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .status-number {
+        font-size: 1.5rem;
+    }
+    
+    .status-label {
+        font-size: 0.75rem;
+    }
+    
+    .weather-widget {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .weather-icon {
+        font-size: 1.2rem;
+    }
+    
+    .weather-temp {
+        font-size: 1rem;
+    }
+    
+    .filter-btn {
+        padding: 3px 6px;
+        font-size: 0.65rem;
+    }
+    
+    .data-table {
+        font-size: 0.65rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 4px 2px;
+    }
+    
+    .notification {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 0.7rem;
+        max-width: 200px;
+    }
+}
+
+/* 🔄 애니메이션 최적화 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 🌙 다크모드 지원 준비 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1a1a1a;
+        --surface-color: #2d2d2d;
+        --text-color: #ffffff;
+        --text-muted: #b0b0b0;
+        --border-color: #404040;
+        --border-light: #353535;
+    }
+}
+
+/* 🖨️ 프린트 스타일 */
 @media print {
     body {
         background: white !important;
-        padding: 0;
+        color: black !important;
     }
     
     .dashboard-container {
         background: white !important;
         box-shadow: none !important;
-        border-radius: 0;
-        padding: 20px;
-        max-width: none;
+        border-radius: 0 !important;
+        padding: 20px !important;
     }
     
-    .main-grid {
-        display: block;
-        height: auto;
+    .header {
+        border-bottom: 2px solid #000 !important;
     }
     
     .grid-item {
         break-inside: avoid;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        background: white !important;
     }
     
-    .header {
-        border-bottom: 2px solid #000;
-        margin-bottom: 30px;
+    .modal {
+        display: none !important;
     }
     
-    .sms-button,
     .filter-btn,
-    .chat-input-container,
-    .drag-indicator {
+    .sms-button,
+    .control-btn {
         display: none !important;
-    }
-    
-    .weather-icon {
-        position: static !important;
-        display: inline-block;
-        margin-left: 10px;
-    }
-    
-    .modal-base {
-        display: none !important;
-    }
-}
-
-/* 고대비 모드 지원 */
-@media (prefers-contrast: high) {
-    .grid-item {
-        border: 2px solid #000;
-    }
-    
-    .filter-btn {
-        border: 2px solid #000;
-    }
-    
-    .filter-btn.active {
-        background: #000 !important;
-        color: #fff !important;
-    }
-    
-    .bar-fill {
-        border: 1px solid #000;
-    }
-}
-
-/* 애니메이션 감소 모드 */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        transition: none !important;
-        animation: none !important;
-    }
-    
-    .grid-item:hover {
-        transform: none !important;
-    }
-    
-    .weather-icon:hover {
-        transform: none !important;
-    }
-    
-    .bar-fill {
-        transition: none !important;
-    }
-}
-
-/* 다크모드 지원 준비 */
-@media (prefers-color-scheme: dark) {
-    .dashboard-container {
-        background: rgba(45, 55, 72, 0.95);
-        color: #e2e8f0;
-    }
-    
-    .grid-item {
-        background: #2d3748;
-        color: #e2e8f0;
-    }
-    
-    .section-title {
-        color: #e2e8f0;
-    }
-    
-    .site-name {
-        color: #e2e8f0;
-    }
-    
-    .chat-messages {
-        background: #4a5568;
-    }
-    
-    .chat-user {
-        background: #718096;
-        color: #e2e8f0;
     }
 }
