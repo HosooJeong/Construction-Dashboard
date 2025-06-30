@@ -4,68 +4,2145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.5, maximum-scale=1.5, user-scalable=yes">
     <title>실시간 종합건설정보(RICS) - 품질관리</title>
+<style>
+        /* 깔끔하고 공식적인 컬러 팔레트 */
+        :root {
+            /* 메인 컬러팔레트 - 블루-그레이 계열 */
+            --primary-blue: #2c5aa0;
+            --primary-gray: #6c757d;
+            --primary-dark: #343a46;
+            
+            /* 블루 계열 */
+            --blue-light: #4a90b8;
+            --blue-dark: #1e3a5f;
+            --blue-bg: rgba(44, 90, 160, 0.08);
+            
+            /* 그레이 계열 */
+            --gray-light: #8d9299;
+            --gray-dark: #495057;
+            --gray-bg: rgba(108, 117, 125, 0.08);
+            
+            /* 상태 색상 - 차분한 톤 */
+            --success: #198754;
+            --warning: #856404;
+            --danger: #721c24;
+            --info: #0dcaf0;
+            
+            /* 공통 */
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* 기존 스타일들이 이어서 나옴... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 2400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            min-height: calc(100vh - 20px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start; /* flex-start로 변경 */
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            min-height: 60px; /* 최소 높이 설정 */
+            flex-wrap: nowrap; /* 줄바꿈 방지 */
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 700;
+            flex-shrink: 0; /* 크기 축소 방지 */
+            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+            margin-right: 20px; /* 오른쪽 여백 추가 */
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0; /* 크기 축소 방지 */
+        }
+
+        /* 작업 필터 컨테이너 전체 */
+        .work-filter-container {
+            display: flex;
+            flex-wrap: wrap; /* 필터 버튼들이 줄바꿈 가능 */
+            gap: 8px;
+            align-items: flex-start; /* 상단 정렬 */
+            max-width: 60%; /* 최대 너비 제한 */
+            margin-top: 5px; /* 약간 위쪽 여백 */
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* 새로운 레이아웃: 3개 컬럼 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            flex: 1;
+            height: calc(100vh - 160px);
+        }
+
+        /* 왼쪽 컬럼: 3행 */
+        .left-column {
+            display: grid;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* 가운데 컬럼: 2행 */
+        .center-column {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* 오른쪽 컬럼: 2행 */
+        .right-column {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-item {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 빈 칸 스타일 */
+        .empty-slot {
+            background: transparent;
+            box-shadow: none;
+            border: 2px dashed #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #bbb;
+            font-size: 1rem;
+        }
+
+        .empty-slot:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #ccc;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+/* 품질관리자 배치기준 테이블 스타일 */
+.quality-manager-table {
+    flex: 1;
+    overflow-y: auto;
+}
+/* 품질관리자 필터 버튼 간격 조정 */
+.quality-manager-filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;  /* 이 부분이 중요! */
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+.manager-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.manager-header {
+    background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark));
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+}
+
+.manager-row {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.manager-row:hover {
+    background: rgba(142, 68, 173, 0.1);
+    transform: translateY(-1px);
+}
+
+.manager-row.special {
+    background: linear-gradient(90deg, var(--blue-bg), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.manager-row.advanced {
+    background: linear-gradient(90deg, var(--blue-bg), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--blue-light);
+    color: var(--blue-light);
+}
+
+
+.manager-row.intermediate {
+    background: linear-gradient(90deg, var(--blue-bg), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--blue-dark);
+    color: var(--blue-dark);
+}
+
+.manager-row.basic {
+    background: linear-gradient(90deg, var(--blue-bg), rgba(255, 255, 255, 1));
+    border-left: 4px solid #5499c7;
+    color: #5499c7;
+}
+
+.manager-cell {
+    padding: 15px 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.manager-grade {
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.grade-icon {
+    font-size: 1.2rem;
+}
+/* 가로형 품질관리자 테이블 스타일 */
+.manager-table-horizontal {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.manager-header-horizontal {
+    background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark));
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+}
+
+.manager-header-horizontal:first-child {
+    width: 25%;
+}
+
+.manager-header-horizontal:not(:first-child) {
+    width: 18.75%;
+}
+
+.manager-row-horizontal {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.manager-row-horizontal:hover {
+    background: rgba(142, 68, 173, 0.05);
+}
+
+.manager-cell-horizontal {
+    padding: 15px 10px;
+    text-align: center;
+    font-size: 0.9rem;
+    border: none;
+    vertical-align: middle;
+}
+
+.manager-cell-horizontal:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: left;
+    padding-left: 15px;
+}
+
+.manager-count-horizontal {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.manager-count-horizontal.special { color: #e74c3c; }
+.manager-count-horizontal.advanced { color: #f39c12; }
+.manager-count-horizontal.intermediate { color: #3498db; }
+.manager-count-horizontal.basic { color: #27ae60; }
+.special .manager-grade { color: #e74c3c; }
+.advanced .manager-grade { color: #f39c12; }
+.intermediate .manager-grade { color: #3498db; }
+.basic .manager-grade { color: #27ae60; }
+
+.manager-count {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.manager-requirement {
+    font-size: 0.75rem;
+    color: #666;
+    line-height: 1.3;
+    text-align: left;
+    padding-left: 8px;
+}
+
+.requirement-text {
+    margin-bottom: 2px;
+}
+
+.hover-hint {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(142, 68, 173, 0.8);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.manager-row:hover .hover-hint {
+    opacity: 1;
+}
+
+/* 품질관리자 기준 팝업 모달 */
+.manager-criteria-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.manager-criteria-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.manager-criteria-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 80vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.manager-criteria-modal.show .manager-criteria-content {
+    transform: scale(1);
+}
+
+.criteria-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.criteria-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.criteria-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.3s ease;
+}
+
+.criteria-close:hover {
+    color: #e74c3c;
+}
+
+.criteria-content {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 15px;
+    padding: 10px;
+}
+
+.criteria-section {
+    margin-bottom: 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #8e44ad;
+    height: fit-content;
+}
+
+.criteria-section-title {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.criteria-list {
+    list-style: none;
+    padding: 0;
+}
+
+.criteria-list li {
+    padding: 6px 0;
+    color: #555;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.criteria-list li:last-child {
+    border-bottom: none;
+}
+
+.criteria-highlight {
+    background: rgba(142, 68, 173, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+/* 작업 필터 체크박스 스타일 */
+.work-filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.work-filter-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-right: 10px;
+}
+
+.work-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.work-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: rgba(200, 200, 200, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid #e0e0e0;
+}
+
+.work-checkbox-item:hover {
+    background: rgba(200, 200, 200, 0.2);
+    transform: translateY(-1px);
+    border-color: #bbb;
+}
+
+.work-checkbox-item.checked {
+background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark));
+color: white;
+border-color: var(--primary-blue);
+box-shadow: 0 2px 8px rgba(44, 90, 160, 0.3);
+}
+
+.work-checkbox {
+    width: 14px;
+    height: 14px;
+    accent-color: #3498db;
+    cursor: pointer;
+}
+
+.work-checkbox-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+}
+
+.work-checkbox-item.checked .work-checkbox-label {
+    color: white;
+    font-weight: 600;
+}
+
+/* 섹션 헤더 스타일 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* 문자 발송 버튼 */
+.sms-button {
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.sms-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+}
+
+/* 도로 포장 요약 정보 스타일 */
+.paving-summary {
+    display: flex;
+    justify-content: space-between;
+    background: linear-gradient(45deg, var(--primary-gray), var(--gray-dark));
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+}
+
+/* 포장면적 정보를 고정 위치에 */
+.area-info {
+    position: absolute;
+    right: 50px;
+    display: flex;
+    align-items: center;
+    background: rgba(155, 89, 182, 0.1);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid #9b59b6;
+    min-width: 70px;
+    justify-content: center;
+}
+
+.area-amount {
+    font-weight: bold;
+    color: #9b59b6;
+    font-size: 0.85rem;
+    margin-right: 2px;
+}
+
+.area-unit {
+    font-size: 0.75rem;
+    color: #8e44ad;
+    font-weight: 600;
+}
+
+/* SMS 팝업 모달 */
+.sms-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sms-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sms-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.sms-modal.show .sms-modal-content {
+    transform: scale(1);
+}
+
+.sms-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.sms-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.sms-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.3s ease;
+}
+
+.sms-close:hover {
+    color: #e74c3c;
+}
+
+.sms-form-group {
+    margin-bottom: 20px;
+}
+
+.sms-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.sms-input, .sms-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.sms-input:focus, .sms-textarea:focus {
+    border-color: #3498db;
+}
+
+.sms-textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+.sms-char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.sms-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 25px;
+}
+
+.sms-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sms-btn-cancel {
+    background: #ecf0f1;
+    color: #7f8c8d;
+}
+
+.sms-btn-cancel:hover {
+    background: #d5dbdb;
+}
+
+.sms-btn-send {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.sms-btn-send:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+        /* 지도 스타일 */
+        .map-wrapper {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 250px;
+        }
+
+        .map-header {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .map-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+/* 품질통지서 목록 팝업 모달 */
+.notice-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.notice-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.notice-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.notice-modal.show .notice-modal-content {
+    transform: scale(1);
+}
+
+.notice-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.notice-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notice-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.3s ease;
+}
+
+.notice-close:hover {
+    color: #e74c3c;
+}
+
+.notice-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 500px;
+    padding-right: 10px;
+}
+
+.notice-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notice-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.notice-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.notice-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+}
+
+.notice-item:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notice-item.excellent {
+    border-left-color: #27ae60;
+    background: linear-gradient(90deg, rgba(39, 174, 96, 0.05), rgba(248, 249, 250, 1));
+}
+
+.notice-item.poor {
+    border-left-color: #e74c3c;
+    background: linear-gradient(90deg, rgba(231, 76, 60, 0.05), rgba(248, 249, 250, 1));
+}
+
+.notice-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.notice-project {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.notice-date {
+    font-size: 0.8rem;
+    color: #666;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.notice-company {
+    font-size: 0.85rem;
+    color: #495057;
+    margin-bottom: 6px;
+}
+
+.notice-reason {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.4;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.notice-count {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+        .regions-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .region-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .region-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .region-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .region-count {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #f39c12;
+        }
+
+        .back-to-national {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        /* 현장 목록 스타일 */
+        .site-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 300px;
+            padding-right: 5px;
+        }
+
+        .site-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .site-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .site-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .site-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .site-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            min-height: 60px;
+        }
+
+        .site-item:last-child {
+            border-bottom: none;
+        }
+
+        .site-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .site-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .site-details {
+            font-size: 0.75rem;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        .weather-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .weather-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .weather-rain { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+        .weather-hot { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+        .weather-cold { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
+        .weather-wind { background: rgba(26, 188, 156, 0.2); color: #1abc9c; }
+
+        /* 날씨 툴팁 모달 */
+        .weather-tooltip {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            min-width: 280px;
+            max-width: 320px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid #f0f0f0;
+            pointer-events: none;
+        }
+
+        .weather-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid white;
+        }
+
+        .weather-icon:hover .weather-tooltip {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .tooltip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .tooltip-content {
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .weather-data {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 6px 0;
+        }
+
+        .weather-data:not(:last-child) {
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .weather-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .weather-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .weather-critical {
+            color: #e74c3c;
+        }
+
+        .weather-safe {
+            color: #27ae60;
+        }
+
+        .quality-standard {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            border-left: 3px solid #3498db;
+        }
+
+        .standard-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+        }
+
+        .standard-text {
+            color: #666;
+            font-size: 0.7rem;
+        }
+
+        /* 품질 차트 스타일 */
+        .quality-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .quality-label {
+            width: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-align: right;
+        }
+
+        .quality-excellent { color: var(--success); }
+        .quality-good { color: var(--primary-blue); }
+        .quality-average { color: var(--warning); }
+        .quality-poor { color: var(--text-muted); }
+        .quality-bad { color: var(--danger); }
+
+        .bar-container {
+            flex: 1;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+
+        .bar-excellent { background: linear-gradient(45deg, var(--success), #34ce57); }
+        .bar-good { background: linear-gradient(45deg, var(--primary-blue), var(--blue-light)); }
+        .bar-average { background: linear-gradient(45deg, var(--warning), #ffc107); }
+        .bar-poor { background: linear-gradient(45deg, var(--text-muted), var(--gray-light)); }
+        .bar-bad { background: linear-gradient(45deg, var(--danger), #dc3545); }
+
+        .quality-count {
+            width: 30px;
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.8rem;
+        }
+
+        /* 챗봇 스타일 */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    min-height: 400px;  /* 고정 높이로 변경 */
+}
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 0.8rem;
+        }
+
+        .chat-bot {
+            background: #ffffff; /* 카카오톡처럼 흰색 */
+            color: #2c3e50;
+            margin-right: auto;
+            border: 1px solid #e9ecef; /* 연한 테두리 추가 */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 미묘한 그림자 */
+        }
+
+        .chat-user {
+            background: #fee500; /* 카카오톡 노란색 */
+            color: #2c3e50;
+            margin-left: auto;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.8rem;
+        }
+
+        .chat-send {
+            background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark));
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* 프로젝트 리스트 스타일 */
+        .project-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .project-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #f39c12;
+        }
+
+        .project-name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+            color: white;
+        }
+
+        .project-location {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 6px;
+        }
+
+        .project-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            border-radius: 2px;
+        }
+
+        .progress-text {
+            font-size: 0.7rem;
+            color: #f39c12;
+            font-weight: bold;
+            min-width: 30px;
+        }
+
+        /* 알림 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-blue));
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            font-size: 0.8rem;
+            max-width: 280px;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .left-column, .center-column, .right-column {
+                grid-template-rows: auto;
+                grid-template-columns: 1fr;
+            }
+            
+            .regions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .regions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.4rem;
+            }
+            
+            .regions-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 18px;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+/* 드래그 앤 드롭 스타일 */
+.grid-item {
+    cursor: move;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.grid-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.grid-item.drag-over {
+    border: 3px dashed #3498db;
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.empty-slot {
+    cursor: move;
+}
+
+.empty-slot.dragging {
+    opacity: 0.3;
+}
+
+.drag-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(44, 90, 160, 0.8);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.grid-item:hover .drag-indicator {
+    opacity: 1;
+}
+
+.drag-indicator:hover {
+    cursor: grabbing;
+}
+/* 품질통지서 현황 테이블 스타일 */
+.notice-status-table {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.table-header {
+    background: linear-gradient(45deg, #34495e, #2c3e50);
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+}
+
+.table-header:first-child {
+    width: 35%;
+}
+
+.table-header:not(:first-child) {
+    width: 21.67%;
+}
+
+.excellent-row {
+    background: linear-gradient(90deg, rgba(39, 174, 96, 0.05), rgba(46, 204, 113, 0.05));
+    border-left: 4px solid #27ae60;
+}
+
+.poor-row {
+    background: linear-gradient(90deg, rgba(231, 76, 60, 0.05), rgba(192, 57, 43, 0.05));
+    border-left: 4px solid #e74c3c;
+}
+
+.notice-type {
+    padding: 12px 10px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.excellent-type {
+    color: #27ae60;
+}
+
+.poor-type {
+    color: #e74c3c;
+}
+
+.notice-icon {
+    font-size: 1rem;
+}
+
+.count-cell {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+}
+
+.excellent-count {
+    background: linear-gradient(90deg, var(--blue-bg), rgba(255, 255, 255, 1));
+    border-left: 4px solid var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.poor-count {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* 요약 정보 스타일 */
+.notice-summary {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.excellent-stat {
+    background: rgba(39, 174, 96, 0.1);
+    border: 2px solid rgba(39, 174, 96, 0.2);
+}
+
+.poor-stat {
+    background: rgba(231, 76, 60, 0.1);
+    border: 2px solid rgba(231, 76, 60, 0.2);
+}
+
+.ratio-stat {
+    background: rgba(52, 152, 219, 0.1);
+    border: 2px solid rgba(52, 152, 219, 0.2);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #666;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.excellent-stat .stat-value {
+    color: #27ae60;
+}
+
+.poor-stat .stat-value {
+    color: #e74c3c;
+}
+
+.ratio-stat .stat-value {
+    color: #3498db;
+}
+
+/* 호버 효과 */
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 반응형 */
+@media (max-width: 1440px) {
+    .summary-stats {
+        flex-direction: column;
+        gap: 8px;
+    }
     
-    <!-- CSS 모듈들 -->
-    <link rel="stylesheet" href="src/css/base.css">
-    <link rel="stylesheet" href="src/css/components.css">
-    <link rel="stylesheet" href="src/css/tables-modals.css">
-    <link rel="stylesheet" href="src/css/responsive.css">
+    .stat-item {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .table-header, .count-cell, .notice-type {
+        font-size: 0.75rem;
+        padding: 8px 6px;
+    }
+}
+/* 품질 차트 필터 버튼 스타일 */
+.quality-filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.filter-btn {
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    background: white;
+    color: #666;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    transform: translateY(-1px);
+}
+
+.filter-btn.active {
+    background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark));
+    color: white;
+    border-color: var(--primary-blue);
+    font-weight: 600;
+}
+
+.filter-btn.active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+/* 레미콘 요약 정보 스타일 (도로 포장과 동일한 색상) */
+.concrete-summary {
+    display: flex;
+    justify-content: space-between;
+    background: linear-gradient(45deg, var(--primary-gray), var(--gray-dark)); /* 도로 포장과 동일한 색상 */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.summary-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.summary-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 현장 아이템 레이아웃 개선 */
+.site-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 60px;
+    position: relative;
+}
+
+.site-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 타설량 정보를 고정 위치에 */
+.volume-info {
+    position: absolute;
+    right: 50px;
+    display: flex;
+    align-items: center;
+    background: rgba(230, 126, 34, 0.1);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid #e67e22;
+    min-width: 70px;
+    justify-content: center;
+}
+
+.volume-amount {
+    font-weight: bold;
+    color: #e67e22;
+    font-size: 0.85rem;
+    margin-right: 2px;
+}
+
+.volume-unit {
+    font-size: 0.75rem;
+    color: #d35400;
+    font-weight: 600;
+}
+.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clickable:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+/* 날씨 아이콘을 맨 오른쪽에 고정 */
+.weather-icon {
+    position: absolute;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+/* 기타 검색 컨테이너 */
+.work-search-container {
+    display: none; /* 초기에는 완전히 숨김 */
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.work-search-container.show {
+    display: flex; /* 보이는 상태에서는 flex */
+    max-height: 60px;
+    opacity: 1;
+}
+
+.work-search-input {
+    padding: 6px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.work-search-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.work-search-btn {
+    background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark));
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.work-search-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+/* 구조물 현황 테이블 스타일 - 가로형 (품질관리자 테이블과 동일한 색상) */
+.structure-status-table {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.structure-filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.structure-table-horizontal {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.structure-header-horizontal {
+    background: linear-gradient(45deg, var(--primary-blue), var(--blue-dark)); /* 품질관리자와 동일한 색상 */
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    width: 20%;
+}
+
+.structure-data-row {
+    transition: all 0.3s ease;
+}
+
+.structure-data-row:hover {
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.structure-count-cell {
+    padding: 20px 15px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.0rem;
+    color: #2c3e50;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.structure-count-cell:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateY(-1px);
+}
+
+.structure-count-cell.bridge-clickable {
+    color: var(--primary-green);
+    cursor: pointer;
+}
+
+.structure-count-cell.bridge-clickable:hover {
+    background: var(--green-bg);
+    color: var(--green-dark);
+}
+
+/* 교량 상세 모달 */
+.bridge-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.bridge-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.bridge-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 80vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.bridge-modal.show .bridge-modal-content {
+    transform: scale(1);
+}
+
+.bridge-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.bridge-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bridge-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.3s ease;
+}
+
+.bridge-close:hover {
+    color: #e74c3c;
+}
+
+.bridge-filter-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.bridge-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.bridge-filter-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #666;
+}
+
+.bridge-filter-select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: white;
+    cursor: pointer;
+}
+
+.bridge-table-container {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.bridge-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.bridge-table th {
+    background: linear-gradient(45deg, #e67e22, #f39c12);
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.bridge-table td {
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.bridge-table tbody tr:hover {
+    background: rgba(230, 126, 34, 0.05);
+}
+
+.bridge-name {
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: left !important;
+}
+/* 새로운 CSS 여기까지 👆 */
+
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- 헤더 -->
-        <div class="header">
-            <h1>실시간 종합건설정보(RICS) - 품질관리</h1>
-            
-            <!-- 작업 필터 체크박스 -->
-            <div class="work-filter-container">
-                <span class="work-filter-title">작업 필터:</span>
-                <div class="work-checkbox-group">
-                    <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
-                        <input type="checkbox" class="work-checkbox" checked>
-                        <span class="work-checkbox-label">🚛 레미콘 타설</span>
-                    </div>
-                    <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
-                        <input type="checkbox" class="work-checkbox" checked>
-                        <span class="work-checkbox-label">🛣️ 도로 포장</span>
-                    </div>
-                    <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
-                        <input type="checkbox" class="work-checkbox" checked>
-                        <span class="work-checkbox-label">⚒️ 다짐</span>
-                    </div>
-                    <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
-                        <input type="checkbox" class="work-checkbox">
-                        <span class="work-checkbox-label">🔧 철근 조립</span>
-                    </div>
-                    <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
-                        <input type="checkbox" class="work-checkbox">
-                        <span class="work-checkbox-label">🛡️ 방수 공사</span>
-                    </div>
-                    <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
-                        <input type="checkbox" class="work-checkbox">
-                        <span class="work-checkbox-label">🔍 기타</span>
-                    </div>
-                    <div class="work-search-container" id="work-search-container" style="display: none;">
-                        <input type="text" class="work-search-input" id="work-search-input" placeholder="작업 키워드 검색...">
-                        <button class="work-search-btn" onclick="searchWork()">검색</button>
-                    </div>
-                </div>
+<div class="header">
+    <h1>실시간 종합건설정보(RICS) - 품질관리</h1>
+    
+    <!-- 작업 필터 체크박스 -->
+    <div class="work-filter-container">
+        <span class="work-filter-title">작업 필터:</span>
+        <div class="work-checkbox-group">
+            <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
+                <input type="checkbox" class="work-checkbox" checked>
+                <span class="work-checkbox-label">🚛 레미콘 타설</span>
             </div>
-            
-            <div class="user-info">
-                <div class="user-avatar">관</div>
-                <div class="user-details">
-                    <div class="user-name">본사담당자</div>
-                    <div class="user-role">116362 정호수</div>
-                </div>
+            <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
+                <input type="checkbox" class="work-checkbox" checked>
+                <span class="work-checkbox-label">🛣️ 도로 포장</span>
             </div>
+            <div class="work-checkbox-item checked" onclick="toggleWorkFilter(this)">
+                <input type="checkbox" class="work-checkbox" checked>
+                <span class="work-checkbox-label">⚒️ 다짐</span>
+            </div>
+            <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
+                <input type="checkbox" class="work-checkbox">
+                <span class="work-checkbox-label">🔧 철근 조립</span>
+            </div>
+            <div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
+                <input type="checkbox" class="work-checkbox">
+                <span class="work-checkbox-label">🛡️ 방수 공사</span>
+            </div>
+<div class="work-checkbox-item" onclick="toggleWorkFilter(this)">
+    <input type="checkbox" class="work-checkbox">
+    <span class="work-checkbox-label">🔍 기타</span>
+</div>
+<div class="work-search-container" id="work-search-container">
+    <input type="text" class="work-search-input" id="work-search-input" placeholder="작업 키워드 검색...">
+    <button class="work-search-btn" onclick="searchWork()">검색</button>
+</div>
         </div>
+    </div>
+</div>
 
-        <!-- 메인 그리드 -->
-        <div class="main-grid">
+<div class="main-grid">
             <!-- 왼쪽 컬럼 (3행) -->
             <div class="left-column">
-                <!-- 1번: 현장 품질등급 현황 -->
+ <!-- 1번: 현장 품질등급 현황 -->
                 <div class="grid-item" draggable="true" data-widget-id="1">
                     <div class="drag-indicator">⋮⋮</div>
                     <h2 class="section-title">📊 현장 품질등급 현황</h2>
@@ -81,99 +2158,77 @@
                     <div id="quality-chart"></div>
                 </div>
 
-                <!-- 2번: 품질관리 주요 구조물 및 자재 현황 -->
-                <div class="grid-item" draggable="true" data-widget-id="2">
-                    <div class="drag-indicator">⋮⋮</div>
-                    <h2 class="section-title">🏗️ 품질관리 주요 구조물 및 자재 현황</h2>
-                    <div class="structure-filter-buttons" id="structure-filter-buttons">
-                        <button class="filter-btn active" data-region="전국">전국</button>
-                        <button class="filter-btn" data-region="수도권">수도권</button>
-                        <button class="filter-btn" data-region="강원권">강원권</button>
-                        <button class="filter-btn" data-region="충청권">충청권</button>
-                        <button class="filter-btn" data-region="영남권">영남권</button>
-                        <button class="filter-btn" data-region="호남권">호남권</button>
-                        <button class="filter-btn" data-region="제주권">제주권</button>
-                    </div>
-                    
-                    <!-- 구조물 테이블 -->
-                    <div class="structure-status-table">
-                        <table class="structure-table-horizontal">
-                            <thead>
-                                <tr>
-                                    <th class="structure-header-horizontal">🌉 교량</th>
-                                    <th class="structure-header-horizontal">🧱 옹벽</th>
-                                    <th class="structure-header-horizontal">🚇 지하차도</th>
-                                    <th class="structure-header-horizontal">⚙️ 펌프장</th>
-                                    <th class="structure-header-horizontal">🌊 하천</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="structure-data-row" id="structure-data-row">
-                                    <!-- 동적으로 생성 -->
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- 자재 테이블 (새로 추가!) -->
-                    <div class="material-status-table" style="margin-top: 15px;">
-                        <table class="structure-table-horizontal">
-                            <thead>
-                                <tr>
-                                    <th class="structure-header-horizontal">💧 상수관</th>
-                                    <th class="structure-header-horizontal">🚰 오수관</th>
-                                    <th class="structure-header-horizontal">🌧️ 우수관</th>
-                                    <th class="structure-header-horizontal">🛤️ 경계석</th>
-                                    <th class="structure-header-horizontal">📦 기타</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="material-data-row" id="material-data-row">
-                                    <!-- 동적으로 생성 -->
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- 2번: 품질관리 주요 구조물 및 자재 현황 -->
+<div class="grid-item" draggable="true" data-widget-id="2">
+    <div class="drag-indicator">⋮⋮</div>
+    <h2 class="section-title">🏗️ 품질관리 주요 구조물 및 자재 현황</h2>
+    <div class="structure-filter-buttons" id="structure-filter-buttons">
+        <button class="filter-btn active" data-region="전국">전국</button>
+        <button class="filter-btn" data-region="수도권">수도권</button>
+        <button class="filter-btn" data-region="강원권">강원권</button>
+        <button class="filter-btn" data-region="충청권">충청권</button>
+        <button class="filter-btn" data-region="영남권">영남권</button>
+        <button class="filter-btn" data-region="호남권">호남권</button>
+        <button class="filter-btn" data-region="제주권">제주권</button>
+    </div>
+    <div class="structure-status-table">
+        <table class="structure-table-horizontal">
+            <thead>
+                <tr>
+                    <th class="structure-header-horizontal">🌉 교량</th>
+                    <th class="structure-header-horizontal">🧱 옹벽</th>
+                    <th class="structure-header-horizontal">🚇 지하차도</th>
+                    <th class="structure-header-horizontal">⚙️ 펌프장</th>
+                    <th class="structure-header-horizontal">🌊 하천</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="structure-data-row" id="structure-data-row">
+                    <!-- 동적으로 생성 -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                <!-- 3번: 품질관리자 배치기준 현황 -->
-                <div class="grid-item" draggable="true" data-widget-id="3">
-                    <div class="drag-indicator">⋮⋮</div>
-                    <div class="section-header">
-                        <h2 class="section-title">👷‍♂️ 품질관리자 배치기준 현황</h2>
-                        <button class="sms-button" onclick="event.stopPropagation(); window.dashboardModals.showManagerCriteria()">📋 배치 기준</button>
-                    </div>
-                    <div class="quality-manager-filter-buttons" id="quality-manager-filter-buttons">
-                        <button class="filter-btn active" data-region="전국">전국</button>
-                        <button class="filter-btn" data-region="수도권">수도권</button>
-                        <button class="filter-btn" data-region="강원권">강원권</button>
-                        <button class="filter-btn" data-region="충청권">충청권</button>
-                        <button class="filter-btn" data-region="영남권">영남권</button>
-                        <button class="filter-btn" data-region="호남권">호남권</button>
-                        <button class="filter-btn" data-region="제주권">제주권</button>
-                    </div>
-                    <div class="quality-manager-table">
-                        <table class="manager-table-horizontal">
-                            <thead>
-                                <tr>
-                                    <th class="manager-header-horizontal">구분</th>
-                                    <th class="manager-header-horizontal">🔥 특급</th>
-                                    <th class="manager-header-horizontal">⭐ 고급</th>
-                                    <th class="manager-header-horizontal">🛠️ 중급</th>
-                                    <th class="manager-header-horizontal">📋 초급</th>
-                                </tr>
-                            </thead>
-                            <tbody id="manager-table-body-horizontal">
-                                <!-- 동적으로 생성 -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- 3번: 품질관리자 배치기준 현황 -->
+<div class="grid-item" draggable="true" data-widget-id="3">
+    <div class="drag-indicator">⋮⋮</div>
+    <div class="section-header">
+        <h2 class="section-title">👷‍♂️ 품질관리자 배치기준 현황</h2>
+        <button class="sms-button" onclick="showManagerCriteria()">📋 배치 기준</button>
+    </div>
+    <div class="quality-manager-filter-buttons" id="quality-manager-filter-buttons">
+        <button class="filter-btn active" data-region="전국">전국</button>
+        <button class="filter-btn" data-region="수도권">수도권</button>
+        <button class="filter-btn" data-region="강원권">강원권</button>
+        <button class="filter-btn" data-region="충청권">충청권</button>
+        <button class="filter-btn" data-region="영남권">영남권</button>
+        <button class="filter-btn" data-region="호남권">호남권</button>
+        <button class="filter-btn" data-region="제주권">제주권</button>
+    </div>
+    <div class="quality-manager-table">
+        <table class="manager-table-horizontal">
+            <thead>
+                <tr>
+                    <th class="manager-header-horizontal">구분</th>
+                    <th class="manager-header-horizontal">🔥 특급</th>
+                    <th class="manager-header-horizontal">⭐ 고급</th>
+                    <th class="manager-header-horizontal">🛠️ 중급</th>
+                    <th class="manager-header-horizontal">📋 초급</th>
+                </tr>
+            </thead>
+            <tbody id="manager-table-body-horizontal">
+                <!-- 동적으로 생성 -->
+            </tbody>
+        </table>
+    </div>
+</div>
             </div>
 
             <!-- 가운데 컬럼 (2행) -->
             <div class="center-column">
-                <!-- 4번: 금일 레미콘 타설 현장 -->
+<!-- 4번: 금일 레미콘 타설 현장 -->
                 <div class="grid-item" draggable="true" data-widget-id="4">
                     <div class="drag-indicator">⋮⋮</div>
                     <div class="section-header">
@@ -203,33 +2258,34 @@
                 </div>
 
                 <!-- 5번: 금일 도로 포장 현장 -->
-                <div class="grid-item" draggable="true" data-widget-id="5">
-                    <div class="drag-indicator">⋮⋮</div>
-                    <div class="section-header">
-                        <h2 class="section-title">🛣️ 금일 도로 포장 현장</h2>
-                        <button class="sms-button" id="paving-sms-button">📱 문자 발송</button>
-                    </div>
-                    <div class="paving-filter-buttons" id="paving-filter-buttons">
-                        <button class="filter-btn active" data-region="전국">전국</button>
-                        <button class="filter-btn" data-region="수도권">수도권</button>
-                        <button class="filter-btn" data-region="강원권">강원권</button>
-                        <button class="filter-btn" data-region="충청권">충청권</button>
-                        <button class="filter-btn" data-region="영남권">영남권</button>
-                        <button class="filter-btn" data-region="호남권">호남권</button>
-                        <button class="filter-btn" data-region="제주권">제주권</button>
-                    </div>
-                    <div class="paving-summary" id="paving-summary">
-                        <div class="summary-item">
-                            <span class="summary-label">현장 수:</span>
-                            <span class="summary-value" id="paving-site-count">-</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">총 포장면적:</span>
-                            <span class="summary-value" id="paving-total-area">-</span>
-                        </div>
-                    </div>
-                    <div class="site-list" id="paving-sites"></div>
-                </div>
+<!-- 5번: 금일 도로 포장 현장 -->
+<div class="grid-item" draggable="true" data-widget-id="5">
+    <div class="drag-indicator">⋮⋮</div>
+    <div class="section-header">
+        <h2 class="section-title">🛣️ 금일 도로 포장 현장</h2>
+        <button class="sms-button" id="paving-sms-button">📱 문자 발송</button>
+    </div>
+    <div class="paving-filter-buttons" id="paving-filter-buttons">
+        <button class="filter-btn active" data-region="전국">전국</button>
+        <button class="filter-btn" data-region="수도권">수도권</button>
+        <button class="filter-btn" data-region="강원권">강원권</button>
+        <button class="filter-btn" data-region="충청권">충청권</button>
+        <button class="filter-btn" data-region="영남권">영남권</button>
+        <button class="filter-btn" data-region="호남권">호남권</button>
+        <button class="filter-btn" data-region="제주권">제주권</button>
+    </div>
+    <div class="paving-summary" id="paving-summary">
+        <div class="summary-item">
+            <span class="summary-label">현장 수:</span>
+            <span class="summary-value" id="paving-site-count">-</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">총 포장면적:</span>
+            <span class="summary-value" id="paving-total-area">-</span>
+        </div>
+    </div>
+    <div class="site-list" id="paving-sites"></div>
+</div>
             </div>
 
             <!-- 오른쪽 컬럼 (2행) -->
@@ -242,27 +2298,2001 @@
                 </div>
 
                 <!-- 7번: 품질관리 도우미 -->
-                <div class="grid-item" draggable="true" data-widget-id="7">
-                    <div class="drag-indicator">⋮⋮</div>
-                    <h2 class="section-title">🤖 품질관리 도우미</h2>
-                    <div class="chat-messages" id="chat-messages">
-                        <!-- 챗봇 메시지들이 동적으로 생성됩니다 -->
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" class="chat-input" id="chat-input" placeholder="품질관리 질문을 입력하세요...">
-                        <button class="chat-send" id="chat-send-btn">전송</button>
-                    </div>
-                </div>
+<div class="grid-item" draggable="true" data-widget-id="7">
+    <div class="drag-indicator">⋮⋮</div>
+    <h2 class="section-title">🤖 품질관리 도우미</h2>
+<div class="chat-messages" id="chat-messages">
+    <div class="chat-message chat-bot">
+        안녕하세요! 건설공사 품질관리에 대해 궁금한 점이 있으시면 언제든 물어보세요.
+    </div>
+    <div class="chat-message chat-user">
+        강우시 콘크리트 타설 기준은?
+    </div>
+    <div class="chat-message chat-bot">
+        강우시 콘크리트 타설 기준은 다음과 같습니다:<br><br>
+        • 강수량: 시간당 15mm 이하<br>
+        • 일 강수량: 50mm 이하<br>
+        • 강우 중 타설 금지 원칙<br>
+        • 타설 후 2시간 이내 강우 시 양생보호 필수<br>
+        • 강우 예보 시 타설 계획 조정 권장<br><br>
+        💡 현재 대시보드에서 실시간 기상정보를 확인하실 수 있습니다!
+    </div>
+</div>
+    <div class="chat-input-container">
+        <input type="text" class="chat-input" id="chat-input" placeholder="품질관리 질문을 입력하세요...">
+        <button class="chat-send" id="chat-send-btn">전송</button>
             </div>
         </div>
     </div>
 
-    <!-- 모듈화 완료 안내 배너 -->
-    <div style="position: fixed; bottom: 20px; left: 20px; background: linear-gradient(45deg, #27ae60, #2ecc71); color: white; padding: 10px 15px; border-radius: 25px; font-size: 0.8rem; z-index: 1000; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);">
-        ✨ 모듈화 완료 - v2.0.0
+    <script>
+        // 데이터
+// 품질관리자 배치기준 데이터
+// 구조물 현황 데이터
+var structureData = {
+    '전국': [
+        { type: '교량', icon: '🌉', count: 1247, progress: 78, status: 'good', statusText: '양호' },
+        { type: '옹벽', icon: '🧱', count: 892, progress: 85, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 156, progress: 62, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 89, progress: 71, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 234, progress: 82, status: 'good', statusText: '양호' }
+    ],
+    '수도권': [
+        { type: '교량', icon: '🌉', count: 487, progress: 81, status: 'good', statusText: '양호' },
+        { type: '옹벽', icon: '🧱', count: 342, progress: 88, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 78, progress: 65, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 34, progress: 74, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 89, progress: 79, status: 'good', statusText: '양호' }
+    ],
+    '강원권': [
+        { type: '교량', icon: '🌉', count: 156, progress: 72, status: 'normal', statusText: '보통' },
+        { type: '옹벽', icon: '🧱', count: 98, progress: 76, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 12, progress: 58, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 8, progress: 67, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 34, progress: 81, status: 'good', statusText: '양호' }
+    ],
+    '충청권': [
+        { type: '교량', icon: '🌉', count: 234, progress: 76, status: 'good', statusText: '양호' },
+        { type: '옹벽', icon: '🧱', count: 167, progress: 83, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 23, progress: 61, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 15, progress: 69, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 45, progress: 84, status: 'good', statusText: '양호' }
+    ],
+    '영남권': [
+        { type: '교량', icon: '🌉', count: 298, progress: 79, status: 'good', statusText: '양호' },
+        { type: '옹벽', icon: '🧱', count: 221, progress: 87, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 34, progress: 64, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 25, progress: 73, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 52, progress: 85, status: 'good', statusText: '양호' }
+    ],
+    '호남권': [
+        { type: '교량', icon: '🌉', count: 187, progress: 75, status: 'good', statusText: '양호' },
+        { type: '옹벽', icon: '🧱', count: 134, progress: 81, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 18, progress: 59, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 12, progress: 68, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 28, progress: 83, status: 'good', statusText: '양호' }
+    ],
+    '제주권': [
+        { type: '교량', icon: '🌉', count: 45, progress: 73, status: 'normal', statusText: '보통' },
+        { type: '옹벽', icon: '🧱', count: 32, progress: 78, status: 'good', statusText: '양호' },
+        { type: '지하차도', icon: '🚇', count: 3, progress: 55, status: 'delay', statusText: '지연' },
+        { type: '펌프장', icon: '⚙️', count: 2, progress: 65, status: 'normal', statusText: '보통' },
+        { type: '하천', icon: '🌊', count: 8, progress: 80, status: 'good', statusText: '양호' }
+    ]
+};
+
+var currentStructureRegion = '전국';
+
+// 교량 상세 데이터
+var bridgeDetailData = [
+    { name: '한강대교', type: '트러스교', method: 'FCM공법', length: 1005, span: 52.5, width: 27.0, region: '수도권', status: '시공중' },
+    { name: '잠실대교', type: '현수교', method: 'MSS공법', length: 1270, span: 65.0, width: 31.5, region: '수도권', status: '완료' },
+    { name: '성수대교', type: '트러스교', method: 'FCM공법', length: 1160, span: 58.0, width: 25.0, region: '수도권', status: '시공중' },
+    { name: '영종대교', type: '현수교', method: 'FCM공법', length: 4420, span: 300.0, width: 32.0, region: '수도권', status: '완료' },
+    { name: '인천대교', type: '사장교', method: 'FCM공법', length: 21380, span: 800.0, width: 33.4, region: '수도권', status: '완료' },
+    { name: '여수대교', type: '사장교', method: 'MSS공법', length: 2260, span: 155.0, width: 23.5, region: '호남권', status: '시공중' },
+    { name: '진도대교', type: '사장교', method: 'FCM공법', length: 484, span: 344.0, width: 11.7, region: '호남권', status: '완료' },
+    { name: '거제대교', type: '사장교', method: 'MSS공법', length: 8900, span: 115.0, width: 13.0, region: '영남권', status: '완료' },
+    { name: '부산대교', type: '현수교', method: 'FCM공법', length: 2050, span: 540.0, width: 32.0, region: '영남권', status: '시공중' },
+    { name: '울산대교', type: '트러스교', method: 'FCM공법', length: 1740, span: 85.0, width: 28.0, region: '영남권', status: '시공중' },
+    { name: '대전고가교', type: '박스거더교', method: 'FSM공법', length: 890, span: 45.0, width: 24.0, region: '충청권', status: '완료' },
+    { name: '청주대교', type: '트러스교', method: 'FCM공법', length: 1320, span: 62.0, width: 26.5, region: '충청권', status: '시공중' },
+    { name: '춘천대교', type: '박스거더교', method: 'FSM공법', length: 780, span: 40.0, width: 22.0, region: '강원권', status: '완료' },
+    { name: '강릉대교', type: '트러스교', method: 'FCM공법', length: 1050, span: 55.0, width: 25.0, region: '강원권', status: '시공중' },
+    { name: '제주대교', type: '박스거더교', method: 'FSM공법', length: 680, span: 38.0, width: 20.0, region: '제주권', status: '완료' }
+];
+
+var currentBridgeRegion = '전체';
+var currentBridgeType = '전체';
+var currentBridgeMethod = '전체';
+var currentBridgeStatus = '전체';
+var qualityManagerData = {
+    '전국': [
+        { grade: '특급', icon: '🔥', count: 8, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 15, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 42, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 67, type: 'basic' }
+    ],
+    '수도권': [
+        { grade: '특급', icon: '🔥', count: 3, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 6, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 18, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 28, type: 'basic' }
+    ],
+    '강원권': [
+        { grade: '특급', icon: '🔥', count: 0, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 1, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 5, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 8, type: 'basic' }
+    ],
+    '충청권': [
+        { grade: '특급', icon: '🔥', count: 1, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 2, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 8, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 12, type: 'basic' }
+    ],
+    '영남권': [
+        { grade: '특급', icon: '🔥', count: 3, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 4, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 15, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 22, type: 'basic' }
+    ],
+    '호남권': [
+        { grade: '특급', icon: '🔥', count: 1, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 2, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 6, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 10, type: 'basic' }
+    ],
+    '제주권': [
+        { grade: '특급', icon: '🔥', count: 0, type: 'special' },
+        { grade: '고급', icon: '⭐', count: 0, type: 'advanced' },
+        { grade: '중급', icon: '🛠️', count: 2, type: 'intermediate' },
+        { grade: '초급', icon: '📋', count: 5, type: 'basic' }
+    ]
+};
+
+var currentManagerRegion = '전국';
+
+// 품질관리자 기준 정보
+var managerCriteria = {
+    '특급': {
+        title: '🔥 특급품질관리 대상공사',
+        criteria: [
+            '공사비 1,000억원 이상',
+            '5만㎡ 이상 다중이용건축물',
+            '특급기술자 1명 이상 + 중급기술자 2명 이상',
+            '시험실 규모: 50㎡ 이상',
+            '품질관리계획서 수립 의무'
+        ]
+    },
+    '고급': {
+        title: '⭐ 고급품질관리 대상공사',
+        criteria: [
+            '공사비 500억~1,000억원 미만',
+            '특급품질관리 대상이 아닌 공사',
+            '고급기술자 1명 이상 + 중급기술자 2명 이상',
+            '시험실 규모: 50㎡ 이상',
+            '품질관리계획서 수립 의무'
+        ]
+    },
+    '중급': {
+        title: '🛠️ 중급품질관리 대상공사',
+        criteria: [
+            '공사비 100억~500억원 미만',
+            '연면적 5,000㎡ 이상 다중이용건축물',
+            '중급기술자 1명 이상 + 초급기술자 1명 이상',
+            '시험실 규모: 20㎡ 이상',
+            '품질관리계획서 수립 의무'
+        ]
+    },
+    '초급': {
+        title: '📋 초급품질관리 대상공사',
+        criteria: [
+            '공사비 2억~100억원 미만',
+            '중급품질관리 대상이 아닌 공사',
+            '초급기술자 1명 이상',
+            '시험실 규모: 20㎡ 이상',
+            '품질관리계획서 수립 의무'
+        ]
+    }
+};
+
+// 품질관리자 테이블 렌더링 (가로형)
+// 구조물 테이블 렌더링 (가로형)
+function renderStructureTable(region) {
+    var container = document.getElementById('structure-data-row');
+    if (!container) return;
+    
+    region = region || currentStructureRegion || '전국';
+    var data = structureData[region] || structureData['전국'];
+    
+    // 구조물 순서 정의
+    var structureOrder = ['교량', '옹벽', '지하차도', '펌프장', '하천'];
+    
+    var html = '';
+    for (var i = 0; i < structureOrder.length; i++) {
+        var structureName = structureOrder[i];
+        var structureInfo = data.find(function(item) {
+            return item.type === structureName;
+        });
+        
+        var count = structureInfo ? structureInfo.count : 0;
+        var isClickable = structureName === '교량';
+        
+        html += '<td class="structure-count-cell' + (isClickable ? ' bridge-clickable' : '') + '"' +
+                (isClickable ? ' onclick="showBridgeModal()"' : '') + '>';
+        html += count + '개소';
+        html += '</td>';
+    }
+    
+    container.innerHTML = html;
+}
+
+// 구조물 요약 정보 업데이트
+function updateStructureSummary(total, avgProgress, completed) {
+    var totalEl = document.getElementById('total-structures');
+    var progressEl = document.getElementById('avg-progress');
+    var completedEl = document.getElementById('completed-structures');
+    
+    if (totalEl) totalEl.textContent = total + '개소';
+    if (progressEl) progressEl.textContent = avgProgress + '%';
+    if (completedEl) completedEl.textContent = completed + '개소';
+}
+
+// 교량 상세 모달 표시
+function showBridgeModal() {
+    var modal = document.getElementById('bridge-modal');
+    if (!modal) {
+        createBridgeModal();
+        modal = document.getElementById('bridge-modal');
+    }
+    
+    renderBridgeTable();
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// 교량 모달 숨기기
+function hideBridgeModal() {
+    var modal = document.getElementById('bridge-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// 교량 모달 HTML 생성
+function createBridgeModal() {
+    var modalHtml = `
+        <div class="bridge-modal" id="bridge-modal" onclick="hideBridgeModal()">
+            <div class="bridge-modal-content" onclick="event.stopPropagation()">
+                <div class="bridge-modal-header">
+                    <h3 class="bridge-modal-title">🌉 교량 상세 현황</h3>
+                    <button class="bridge-close" onclick="hideBridgeModal()">×</button>
+                </div>
+                
+                <div class="bridge-filter-container">
+                    <div class="bridge-filter-group">
+                        <label class="bridge-filter-label">권역</label>
+                        <select class="bridge-filter-select" id="bridge-region-filter" onchange="filterBridges()">
+                            <option value="전체">전체</option>
+                            <option value="수도권">수도권</option>
+                            <option value="강원권">강원권</option>
+                            <option value="충청권">충청권</option>
+                            <option value="영남권">영남권</option>
+                            <option value="호남권">호남권</option>
+                            <option value="제주권">제주권</option>
+                        </select>
+                    </div>
+                    <div class="bridge-filter-group">
+                        <label class="bridge-filter-label">교량형식</label>
+                        <select class="bridge-filter-select" id="bridge-type-filter" onchange="filterBridges()">
+                            <option value="전체">전체</option>
+                            <option value="현수교">현수교</option>
+                            <option value="사장교">사장교</option>
+                            <option value="트러스교">트러스교</option>
+                            <option value="박스거더교">박스거더교</option>
+                        </select>
+                    </div>
+                    <div class="bridge-filter-group">
+                        <label class="bridge-filter-label">공법명</label>
+                        <select class="bridge-filter-select" id="bridge-method-filter" onchange="filterBridges()">
+                            <option value="전체">전체</option>
+                            <option value="FCM공법">FCM공법</option>
+                            <option value="MSS공법">MSS공법</option>
+                            <option value="FSM공법">FSM공법</option>
+                        </select>
+                    </div>
+                    <div class="bridge-filter-group">
+                        <label class="bridge-filter-label">상태</label>
+                        <select class="bridge-filter-select" id="bridge-status-filter" onchange="filterBridges()">
+                            <option value="전체">전체</option>
+                            <option value="시공중">시공중</option>
+                            <option value="완료">완료</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="bridge-table-container">
+                    <table class="bridge-table" id="bridge-table">
+                        <thead>
+                            <tr>
+                                <th>교량명</th>
+                                <th>교량형식</th>
+                                <th>공법명</th>
+                                <th>총연장(m)</th>
+                                <th>경간장(m)</th>
+                                <th>폭원(m)</th>
+                                <th>권역</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bridge-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// 교량 테이블 렌더링
+function renderBridgeTable() {
+    var container = document.getElementById('bridge-table-body');
+    if (!container) return;
+    
+    // 필터링된 데이터 가져오기
+    var filteredData = getFilteredBridgeData();
+    
+    var html = '';
+    for (var i = 0; i < filteredData.length; i++) {
+        var bridge = filteredData[i];
+        html += '<tr>';
+        html += '<td class="bridge-name">' + bridge.name + '</td>';
+        html += '<td>' + bridge.type + '</td>';
+        html += '<td>' + bridge.method + '</td>';
+        html += '<td>' + bridge.length.toLocaleString() + '</td>';
+        html += '<td>' + bridge.span + '</td>';
+        html += '<td>' + bridge.width + '</td>';
+        html += '<td>' + bridge.region + '</td>';
+        html += '<td>' + bridge.status + '</td>';
+        html += '</tr>';
+    }
+    
+    container.innerHTML = html;
+}
+
+// 교량 데이터 필터링
+function getFilteredBridgeData() {
+    var data = bridgeDetailData.slice();
+    
+    if (currentBridgeRegion !== '전체') {
+        data = data.filter(function(bridge) {
+            return bridge.region === currentBridgeRegion;
+        });
+    }
+    
+    if (currentBridgeType !== '전체') {
+        data = data.filter(function(bridge) {
+            return bridge.type === currentBridgeType;
+        });
+    }
+    
+    if (currentBridgeMethod !== '전체') {
+        data = data.filter(function(bridge) {
+            return bridge.method === currentBridgeMethod;
+        });
+    }
+    
+    if (currentBridgeStatus !== '전체') {
+        data = data.filter(function(bridge) {
+            return bridge.status === currentBridgeStatus;
+        });
+    }
+    
+    return data;
+}
+
+// 교량 필터 적용
+function filterBridges() {
+    currentBridgeRegion = document.getElementById('bridge-region-filter').value;
+    currentBridgeType = document.getElementById('bridge-type-filter').value;
+    currentBridgeMethod = document.getElementById('bridge-method-filter').value;
+    currentBridgeStatus = document.getElementById('bridge-status-filter').value;
+    
+    renderBridgeTable();
+}
+function renderManagerTable(region) {
+    var container = document.getElementById('manager-table-body-horizontal');
+    if (!container) return;
+    
+    region = region || currentManagerRegion || '전국';
+    var data = qualityManagerData[region] || qualityManagerData['전국'];
+    
+    // 데이터를 객체로 변환 (등급별로 접근하기 쉽게)
+    var dataMap = {};
+    for (var i = 0; i < data.length; i++) {
+        dataMap[data[i].grade] = data[i];
+    }
+    
+    var html = '';
+    html += '<tr class="manager-row-horizontal">';
+    html += '<td class="manager-cell-horizontal">현장 수</td>';
+    html += '<td class="manager-cell-horizontal">';
+    html += '<div class="manager-count-horizontal special">' + (dataMap['특급'] ? dataMap['특급'].count : 0) + '개소</div>';
+    html += '</td>';
+    html += '<td class="manager-cell-horizontal">';
+    html += '<div class="manager-count-horizontal advanced">' + (dataMap['고급'] ? dataMap['고급'].count : 0) + '개소</div>';
+    html += '</td>';
+    html += '<td class="manager-cell-horizontal">';
+    html += '<div class="manager-count-horizontal intermediate">' + (dataMap['중급'] ? dataMap['중급'].count : 0) + '개소</div>';
+    html += '</td>';
+    html += '<td class="manager-cell-horizontal">';
+    html += '<div class="manager-count-horizontal basic">' + (dataMap['초급'] ? dataMap['초급'].count : 0) + '개소</div>';
+    html += '</td>';
+    html += '</tr>';
+    
+    container.innerHTML = html;
+}
+
+// 배치기준 요약 텍스트
+function getManagerRequirement(grade) {
+    var requirements = {
+        '특급': '<div class="requirement-text">특급기술자 1명 이상</div><div class="requirement-text">중급기술자 2명 이상</div>',
+        '고급': '<div class="requirement-text">고급기술자 1명 이상</div><div class="requirement-text">중급기술자 2명 이상</div>',
+        '중급': '<div class="requirement-text">중급기술자 1명 이상</div><div class="requirement-text">초급기술자 1명 이상</div>',
+        '초급': '<div class="requirement-text">초급기술자 1명 이상</div>'
+    };
+    return requirements[grade] || '';
+}
+
+// 품질관리자 기준 모달 표시 (전체 기준 표시)
+function showManagerCriteria() {
+    var modal = document.getElementById('manager-criteria-modal');
+    if (!modal) {
+        createManagerCriteriaModal();
+        modal = document.getElementById('manager-criteria-modal');
+    }
+    
+    var modalTitle = modal.querySelector('.criteria-modal-title');
+    var criteriaContent = modal.querySelector('.criteria-content');
+    
+    modalTitle.innerHTML = '👷‍♂️ 품질관리자 배치기준';
+    
+    var html = '';
+    var grades = ['특급', '고급', '중급', '초급'];
+    
+    for (var i = 0; i < grades.length; i++) {
+        var grade = grades[i];
+        var criteria = managerCriteria[grade];
+        
+        html += '<div class="criteria-section">';
+        html += '<div class="criteria-section-title">' + criteria.title + '</div>';
+        html += '<ul class="criteria-list">';
+        
+        for (var j = 0; j < criteria.criteria.length; j++) {
+            html += '<li>• ' + criteria.criteria[j] + '</li>';
+        }
+        
+        html += '</ul>';
+        html += '</div>';
+    }
+    
+    criteriaContent.innerHTML = html;
+    
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// 품질관리자 기준 모달 숨기기
+function hideManagerCriteria() {
+    var modal = document.getElementById('manager-criteria-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+}
+// 품질관리자 필터 버튼 이벤트 추가
+var managerFilterButtons = document.querySelectorAll('#quality-manager-filter-buttons .filter-btn');
+managerFilterButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var region = this.getAttribute('data-region');
+        
+        // 모든 버튼에서 active 클래스 제거
+        managerFilterButtons.forEach(function(b) {
+            b.classList.remove('active');
+        });
+        
+        // 클릭된 버튼에 active 클래스 추가
+        this.classList.add('active');
+        
+        // 테이블 업데이트
+        currentManagerRegion = region;
+        renderManagerTable(region);
+        
+        // 알림
+        showAlert(region + ' 품질관리자 현황으로 변경되었습니다! 👷‍♂️');
+    });
+});
+// 품질관리자 기준 모달 HTML 생성
+function createManagerCriteriaModal() {
+    var modalHtml = `
+        <div class="manager-criteria-modal" id="manager-criteria-modal" onclick="hideManagerCriteria()">
+            <div class="manager-criteria-content" onclick="event.stopPropagation()">
+                <div class="criteria-modal-header">
+                    <h3 class="criteria-modal-title">품질관리자 배치기준</h3>
+                    <button class="criteria-close" onclick="hideManagerCriteria()">×</button>
+                </div>
+                <div class="criteria-content"></div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// 품질통지서 데이터
+var noticeData = {
+    excellent: {
+        construction: [
+            { project: '위례신도시 조성공사', company: '대한건설', date: '2025-06-20', reason: '콘크리트 압축강도 기준 초과달성' },
+            { project: '인천검단 택지개발사업', company: '삼성물산', date: '2025-06-18', reason: '시공품질 우수 및 공정관리 탁월' },
+            { project: '광교신도시 A1블록', company: '현대건설', date: '2025-06-15', reason: '아스팔트 포장 품질 우수' },
+            { project: '평택고덕신도시 B-7블록', company: '대림산업', date: '2025-06-12', reason: '다짐도 기준 초과달성' },
+            { project: '청라국제도시 A3블록', company: 'GS건설', date: '2025-06-10', reason: '철근 배근 상태 우수' },
+            { project: '송도국제도시 11공구', company: '포스코건설', date: '2025-06-08', reason: '방수공사 품질 우수' },
+            { project: '춘천혁신도시 2단계', company: '대우건설', date: '2025-06-05', reason: '콘크리트 양생관리 우수' },
+            { project: '세종5-1생활권', company: '롯데건설', date: '2025-06-03', reason: '구조물 시공정밀도 우수' },
+            { project: '김해신도시 2단계', company: '태영건설', date: '2025-06-01', reason: '품질관리시스템 운영 우수' },
+            { project: '새만금신도시 1단계', company: '한화건설', date: '2025-05-28', reason: '토공사 다짐 품질 우수' }
+        ],
+        supervision: [
+            { project: '하남교산신도시 진입도로', company: '한국종합기술', date: '2025-06-19', reason: '설계변경 적정성 검토 우수' },
+            { project: '부산명지지구 연결도로', company: '유신코퍼레이션', date: '2025-06-17', reason: '감리업무 수행 우수' },
+            { project: '진천혁신도시 순환도로', company: '삼안', date: '2025-06-14', reason: '품질관리 감독 우수' },
+            { project: '경부고속도로 확장공사', company: '도화엔지니어링', date: '2025-06-11', reason: '안전관리 감리 우수' },
+            { project: '서해안고속도로 확장공사', company: '건화', date: '2025-06-09', reason: '공정관리 감리 우수' },
+            { project: '울산신정지구 조성공사', company: '대한컨설턴트', date: '2025-06-06', reason: '품질검사 체계 우수' },
+            { project: '원주혁신도시 확장지구', company: '한국설계', date: '2025-06-04', reason: '시공품질 확인 우수' },
+            { project: '대전도안신도시 6생활권', company: '아주엔지니어링', date: '2025-06-02', reason: '재료품질 관리 우수' }
+        ],
+        material: [
+            { item: '레미콘 (25-24-150)', supplier: '한라시멘트', date: '2025-06-21', reason: '압축강도 우수 (설계강도 120% 달성)' },
+            { item: '아스팔트 혼합물', supplier: 'SK건설자재', date: '2025-06-20', reason: '마샬 안정도 기준 초과' },
+            { item: '철근 (SD400)', supplier: '현대제철', date: '2025-06-18', reason: '인장강도 기준 초과달성' },
+            { item: '골재 (자갈)', supplier: '쌍용양회', date: '2025-06-16', reason: '입도분석 결과 우수' },
+            { item: '시멘트 (1종)', supplier: '동양시멘트', date: '2025-06-14', reason: '압축강도 조기발현 우수' },
+            { item: '아스팔트 바인더', supplier: 'GS칼텍스', date: '2025-06-12', reason: '침입도 시험결과 우수' }
+        ]
+    },
+    poor: {
+        construction: [
+            { project: '평택고덕신도시 A블록', company: '중소건설', date: '2025-06-19', reason: '콘크리트 압축강도 부족 (설계강도 85%)' },
+            { project: '새만금신도시 1단계', company: '지역건설', date: '2025-06-16', reason: '다짐도 기준 미달 (92%)' },
+            { project: '울산신정지구', company: '소규모건설', date: '2025-06-13', reason: '철근 배근간격 부적정' },
+            { project: '춘천혁신도시 2단계', company: '협력건설', date: '2025-06-10', reason: '방수공사 시공불량' },
+            { project: '원주혁신도시 확장지구', company: '동반건설', date: '2025-06-07', reason: '아스팔트 포장 두께 부족' },
+            { project: '광주하남산단', company: '신진건설', date: '2025-06-04', reason: '콘크리트 양생 부적절' },
+            { project: '제주영어교육도시', company: '남국건설', date: '2025-06-01', reason: '구조물 시공오차 과다' }
+        ],
+        supervision: [
+            { project: '하남교산신도시 진입도로', company: '소형엔지니어링', date: '2025-06-18', reason: '품질검사 주기 준수 미흡' },
+            { project: '부산명지지구 연결도로', company: '지역기술단', date: '2025-06-15', reason: '감리일지 작성 부실' },
+            { project: '진천혁신도시 순환도로', company: '협력엔지니어링', date: '2025-06-12', reason: '시공품질 확인 소홀' },
+            { project: '경부고속도로 확장공사', company: '동반컨설턴트', date: '2025-06-09', reason: '안전관리 감독 미흡' },
+            { project: '서해안고속도로 확장공사', company: '신규설계', date: '2025-06-06', reason: '공정관리 감리 부실' },
+            { project: '울산신정지구 조성공사', company: '로컬엔지니어링', date: '2025-06-03', reason: '재료품질 검사 누락' }
+        ],
+        material: [
+            { item: '레미콘 (21-18-150)', supplier: '지역레미콘', date: '2025-06-17', reason: '압축강도 부족 (설계강도 88%)' },
+            { item: '아스팔트 혼합물', supplier: '로컬아스콘', date: '2025-06-14', reason: '마샬 안정도 기준 미달' },
+            { item: '철근 (SD400)', supplier: '소형제철', date: '2025-06-11', reason: '인장강도 기준 미달' },
+            { item: '골재 (모래)', supplier: '지역골재', date: '2025-06-08', reason: '입도분석 결과 부적합' }
+        ]
+    }
+};
+        var regionsData = [
+            { name: '수도권', count: 45 },
+            { name: '강원권', count: 12 },
+            { name: '충청권', count: 23 },
+            { name: '영남권', count: 38 },
+            { name: '호남권', count: 19 },
+            { name: '제주권', count: 7 }
+        ];
+
+        var regionProjects = {
+            '수도권': [
+                { name: '위례신도시 조성공사', location: '경기 성남시', status: '시공중', progress: 85 },
+                { name: '인천검단 택지개발사업 조성공사', location: '인천 서구', status: '시공중', progress: 72 },
+                { name: '남양주왕숙 공공주택지구 조성공사', location: '경기 남양주시', status: '시공중', progress: 94 }
+            ],
+            '강원권': [
+                { name: '춘천혁신도시 2단계 조성공사', location: '강원 춘천시', status: '시공중', progress: 67 },
+                { name: '원주혁신도시 확장지구 조성공사', location: '강원 원주시', status: '시공중', progress: 82 }
+            ],
+            '충청권': [
+                { name: '세종5-1생활권 조성공사', location: '세종특별자치시', status: '시공중', progress: 89 },
+                { name: '대전도안신도시 5생활권 조성공사', location: '대전 유성구', status: '시공중', progress: 76 }
+            ],
+            '영남권': [
+                { name: '김해신도시 2단계 조성공사', location: '경남 김해시', status: '시공중', progress: 88 },
+                { name: '창원상남지구 2단계 조성공사', location: '경남 창원시', status: '시공중', progress: 65 }
+            ],
+            '호남권': [
+                { name: '새만금신도시 1단계 조성공사', location: '전북 군산시', status: '시공중', progress: 62 },
+                { name: '전주에코시티 간선도로 조성공사', location: '전북 전주시', status: '시공중', progress: 74 }
+            ],
+            '제주권': [
+                { name: '제주영어교육도시 확장공사', location: '제주 서귀포시', status: '시공중', progress: 77 },
+                { name: '제주첨단과학기술단지 조성공사', location: '제주 제주시', status: '시공중', progress: 84 }
+            ]
+        };
+
+var concreteSites = {
+    '수도권': [
+        { 
+            name: '위례신도시 조성공사', 
+            location: '경기 성남시',
+            volume: 245,
+            weather: 'rain',
+            weatherData: {
+                current: 12.5,
+                unit: 'mm',
+                forecast: '오후 2시~5시 강우 예상 (15-20mm)',
+                todayForecast: '흐림, 오후 소나기',
+                tomorrowForecast: '맑음, 작업 적합',
+                standard: '15mm 이하',
+                status: 'safe'
+            }
+        },
+        { 
+            name: '인천검단 택지개발사업 조성공사', 
+            location: '인천 서구',
+            volume: 180,
+            weather: 'wind',
+            weatherData: {
+                current: 18.5,
+                unit: 'm/s',
+                forecast: '오전 중 강풍주의보 지속 (20-25m/s)',
+                todayForecast: '강풍, 크레인 작업 금지',
+                tomorrowForecast: '바람 약해짐, 작업 가능',
+                standard: '15m/s 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '광교신도시 A1블록 조성공사', 
+            location: '경기 수원시',
+            volume: 320,
+            weather: 'hot',
+            weatherData: {
+                current: 32.8,
+                unit: '°C',
+                forecast: '고온 주의',
+                standard: '30°C 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '평택고덕신도시 B-7블록 조성공사', 
+            location: '경기 평택시',
+            volume: 150,
+            weather: 'rain',
+            weatherData: {
+                current: 8.2,
+                unit: 'mm',
+                forecast: '소나기 예상',
+                standard: '15mm 이하',
+                status: 'safe'
+            }
+        },
+        { 
+            name: '청라국제도시 A3블록 조성공사', 
+            location: '인천 서구',
+            volume: 280,
+            weather: null 
+        },
+        { 
+            name: '송도국제도시 11공구 조성공사', 
+            location: '인천 연수구',
+            volume: 195,
+            weather: 'wind',
+            weatherData: {
+                current: 12.3,
+                unit: 'm/s',
+                forecast: '바람 약함',
+                standard: '15m/s 이하',
+                status: 'safe'
+            }
+        }
+    ],
+    '강원권': [
+        { 
+            name: '춘천혁신도시 2단계 조성공사', 
+            location: '강원 춘천시',
+            volume: 160,
+            weather: 'cold',
+            weatherData: {
+                current: -2.5,
+                unit: '°C',
+                forecast: '추위 지속',
+                standard: '5°C 이상',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '원주혁신도시 확장지구 조성공사', 
+            location: '강원 원주시',
+            volume: 125,
+            weather: null 
+        }
+    ],
+    '충청권': [
+        { 
+            name: '세종5-1생활권 조성공사', 
+            location: '세종특별자치시',
+            volume: 310,
+            weather: 'hot',
+            weatherData: {
+                current: 28.5,
+                unit: '°C',
+                forecast: '맑음',
+                standard: '30°C 이하',
+                status: 'safe'
+            }
+        },
+        { 
+            name: '대전도안신도시 6생활권 조성공사', 
+            location: '대전 유성구',
+            volume: 220,
+            weather: null 
+        }
+    ],
+    '영남권': [
+        { 
+            name: '김해신도시 2단계 조성공사', 
+            location: '경남 김해시',
+            volume: 275,
+            weather: null 
+        },
+        { 
+            name: '부산강서구 명지지구 조성공사', 
+            location: '부산 강서구',
+            volume: 185,
+            weather: 'wind',
+            weatherData: {
+                current: 19.8,
+                unit: 'm/s',
+                forecast: '강풍 경보',
+                standard: '15m/s 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '울산신정지구 조성공사', 
+            location: '울산 남구',
+            volume: 140,
+            weather: null 
+        }
+    ],
+    '호남권': [
+        { 
+            name: '새만금신도시 1단계 조성공사', 
+            location: '전북 군산시',
+            volume: 205,
+            weather: 'wind',
+            weatherData: {
+                current: 22.1,
+                unit: 'm/s',
+                forecast: '강풍주의보 발효 중',
+                standard: '20m/s 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '광주하남산단 조성공사', 
+            location: '광주 광산구',
+            volume: 165,
+            weather: null 
+        }
+    ],
+    '제주권': [
+        { 
+            name: '제주영어교육도시 확장공사', 
+            location: '제주 서귀포시',
+            volume: 95,
+            weather: 'wind',
+            weatherData: {
+                current: 16.5,
+                unit: 'm/s',
+                forecast: '바람 보통',
+                standard: '20m/s 이하',
+                status: 'safe'
+            }
+        }
+    ]
+};
+
+var currentConcreteRegion = '전국';
+
+        var compactionSites = [
+            { 
+                name: '평택고덕신도시 A블록 조성공사', 
+                location: '경기 평택시', 
+                weather: 'rain',
+                weatherData: {
+                    current: 8.2,
+                    unit: 'mm',
+                    forecast: '새벽 소나기 후 점차 개임 (총 10-15mm)',
+                    todayForecast: '오전 비, 오후 흐림',
+                    tomorrowForecast: '맑음, 다짐작업 적합',
+                    standard: '10mm 이하',
+                    status: 'safe'
+                }
+            },
+            { 
+                name: '새만금신도시 1단계 조성공사', 
+                location: '전북 군산시', 
+                weather: 'wind',
+                weatherData: {
+                    current: 22.1,
+                    unit: 'm/s',
+                    forecast: '강풍주의보 발효 중 (25-30m/s 돌풍)',
+                    todayForecast: '강풍, 중장비 작업중단)',
+tomorrowForecast: '바람 다소 약해짐',
+standard: '20m/s 이하',
+status: 'critical'
+}
+},
+{
+name: '울산신정지구 조성공사',
+location: '울산 남구',
+weather: null
+},
+{
+name: '춘천혁신도시 2단계 조성공사',
+location: '강원 춘천시',
+weather: 'cold',
+weatherData: {
+current: -3.5,
+unit: '°C',
+forecast: '한파 지속',
+standard: '5°C 이상',
+status: 'critical'
+}
+},
+{
+name: '원주혁신도시 확장지구 조성공사',
+location: '강원 원주시',
+weather: null
+}
+];
+var pavingSites = [
+        { 
+            name: '하남교산신도시 진입도로 조성공사', 
+            location: '경기 하남시', 
+            weather: 'hot',
+            weatherData: {
+                current: 38.5,
+                unit: '°C',
+                forecast: '폭염특보 지속, 최고 40°C까지 상승',
+                todayForecast: '폭염, 오전 10시~오후 4시 작업금지',
+                tomorrowForecast: '고온 지속, 새벽/저녁 작업 권장',
+                standard: '35°C 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '부산명지지구 연결도로 조성공사', 
+            location: '부산 강서구', 
+            weather: 'rain',
+            weatherData: {
+                current: 25.8,
+                unit: 'mm',
+                forecast: '오후~저녁 집중호우 (시간당 30-50mm)',
+                todayForecast: '집중호우, 포장작업 전면 중단',
+                tomorrowForecast: '비 그침, 노면 건조 후 작업 가능',
+                standard: '20mm 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '진천혁신도시 순환도로 조성공사', 
+            location: '충북 진천군', 
+            weather: 'cold',
+            weatherData: {
+                current: -5.2,
+                unit: '°C',
+                forecast: '한파주의보, 최저 -8°C까지 하강',
+                todayForecast: '한파, 동결방지 조치 필수',
+                tomorrowForecast: '추위 지속, 보온양생 실시',
+                standard: '5°C 이상',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '경부고속도로 확장공사 (수원-오산구간)', 
+            location: '경기 수원시', 
+            weather: 'wind',
+            weatherData: {
+                current: 17.3,
+                unit: 'm/s',
+                forecast: '강풍 지속',
+                standard: '15m/s 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '서해안고속도로 확장공사 (서산-당진구간)', 
+            location: '충남 서산시', 
+            weather: null 
+        }
+    ];
+var pavingSites = {
+    '수도권': [
+        { 
+            name: '하남교산신도시 진입도로 조성공사', 
+            location: '경기 하남시',
+            area: 15600,
+            weather: 'hot',
+            weatherData: {
+                current: 38.5,
+                unit: '°C',
+                forecast: '폭염특보 지속, 최고 40°C까지 상승',
+                todayForecast: '폭염, 오전 10시~오후 4시 작업금지',
+                tomorrowForecast: '고온 지속, 새벽/저녁 작업 권장',
+                standard: '35°C 이하',
+                status: 'critical'
+            }
+        },
+        { 
+            name: '경부고속도로 확장공사 (수원-오산구간)', 
+            location: '경기 수원시',
+            area: 22400,
+            weather: 'wind',
+            weatherData: {
+                current: 17.3,
+                unit: 'm/s',
+                forecast: '강풍 지속',
+                standard: '15m/s 이하',
+                status: 'critical'
+            }
+        }
+    ],
+    '충청권': [
+        { 
+            name: '서해안고속도로 확장공사 (서산-당진구간)', 
+            location: '충남 서산시',
+            area: 18200,
+            weather: null 
+        },
+        { 
+            name: '진천혁신도시 순환도로 조성공사', 
+            location: '충북 진천군',
+            area: 12800,
+            weather: 'cold',
+            weatherData: {
+                current: -5.2,
+                unit: '°C',
+                forecast: '한파주의보, 최저 -8°C까지 하강',
+                todayForecast: '한파, 동결방지 조치 필수',
+                tomorrowForecast: '추위 지속, 보온양생 실시',
+                standard: '5°C 이상',
+                status: 'critical'
+            }
+        }
+    ],
+    '영남권': [
+        { 
+            name: '부산명지지구 연결도로 조성공사', 
+            location: '부산 강서구',
+            area: 16900,
+            weather: 'rain',
+            weatherData: {
+                current: 25.8,
+                unit: 'mm',
+                forecast: '오후~저녁 집중호우 (시간당 30-50mm)',
+                todayForecast: '집중호우, 포장작업 전면 중단',
+                tomorrowForecast: '비 그침, 노면 건조 후 작업 가능',
+                standard: '20mm 이하',
+                status: 'critical'
+            }
+        }
+    ]
+};
+
+var currentPavingRegion = '전국';
+
+var qualityData = {
+    '전국': [
+        { label: '우수', count: 28, color: 'excellent' },
+        { label: '양호', count: 45, color: 'good' },
+        { label: '보통', count: 32, color: 'average' },
+        { label: '미흡', count: 18, color: 'poor' },
+        { label: '불량', count: 8, color: 'bad' }
+    ],
+    '수도권': [
+        { label: '우수', count: 12, color: 'excellent' },
+        { label: '양호', count: 18, color: 'good' },
+        { label: '보통', count: 11, color: 'average' },
+        { label: '미흡', count: 6, color: 'poor' },
+        { label: '불량', count: 3, color: 'bad' }
+    ],
+    '강원권': [
+        { label: '우수', count: 4, color: 'excellent' },
+        { label: '양호', count: 6, color: 'good' },
+        { label: '보통', count: 3, color: 'average' },
+        { label: '미흡', count: 2, color: 'poor' },
+        { label: '불량', count: 1, color: 'bad' }
+    ],
+    '충청권': [
+        { label: '우수', count: 7, color: 'excellent' },
+        { label: '양호', count: 10, color: 'good' },
+        { label: '보통', count: 8, color: 'average' },
+        { label: '미흡', count: 4, color: 'poor' },
+        { label: '불량', count: 2, color: 'bad' }
+    ],
+    '영남권': [
+        { label: '우수', count: 15, color: 'excellent' },
+        { label: '양호', count: 20, color: 'good' },
+        { label: '보통', count: 14, color: 'average' },
+        { label: '미흡', count: 7, color: 'poor' },
+        { label: '불량', count: 4, color: 'bad' }
+    ],
+    '호남권': [
+        { label: '우수', count: 8, color: 'excellent' },
+        { label: '양호', count: 12, color: 'good' },
+        { label: '보통', count: 9, color: 'average' },
+        { label: '미흡', count: 5, color: 'poor' },
+        { label: '불량', count: 2, color: 'bad' }
+    ],
+    '제주권': [
+        { label: '우수', count: 3, color: 'excellent' },
+        { label: '양호', count: 4, color: 'good' },
+        { label: '보통', count: 3, color: 'average' },
+        { label: '미흡', count: 1, color: 'poor' },
+        { label: '불량', count: 1, color: 'bad' }
+    ]
+};
+
+var currentQualityRegion = '전국';
+
+// 초기화
+// 품질통지서 모달 표시
+function showNoticeModal(type, category) {
+    var modal = document.getElementById('notice-modal');
+    if (!modal) {
+        // 모달이 없으면 생성
+        createNoticeModal();
+        modal = document.getElementById('notice-modal');
+    }
+    
+    var data = noticeData[type][category];
+    var title = getNoticeTitle(type, category);
+    
+    // 모달 내용 업데이트
+    var modalTitle = modal.querySelector('.notice-modal-title');
+    var noticeList = modal.querySelector('.notice-list');
+    
+    modalTitle.innerHTML = title;
+    
+    if (data && data.length > 0) {
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            html += '<div class="notice-item ' + type + '">';
+            html += '<div class="notice-item-header">';
+            html += '<div class="notice-project">' + (item.project || item.item) + '</div>';
+            html += '<div class="notice-date">' + item.date + '</div>';
+            html += '</div>';
+            html += '<div class="notice-company">' + (item.company || item.supplier) + '</div>';
+            html += '<div class="notice-reason">' + item.reason + '</div>';
+            html += '</div>';
+        }
+        noticeList.innerHTML = html;
+    } else {
+        noticeList.innerHTML = '<div class="notice-count">등록된 ' + (type === 'excellent' ? '우수' : '미흡') + ' 통지서가 없습니다.</div>';
+    }
+    
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// 품질통지서 모달 숨기기
+function hideNoticeModal() {
+    var modal = document.getElementById('notice-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// 모달 제목 생성
+function getNoticeTitle(type, category) {
+    var typeText = type === 'excellent' ? '🏆 품질우수통지서' : '⚠️ 품질미흡통지서';
+    var categoryText = '';
+    
+    switch(category) {
+        case 'construction': categoryText = '공사'; break;
+        case 'supervision': categoryText = '설계·감리용역'; break;
+        case 'material': categoryText = '지급자재'; break;
+    }
+    
+    return typeText + ' - ' + categoryText;
+}
+
+// 모달 HTML 생성
+function createNoticeModal() {
+    var modalHtml = `
+        <div class="notice-modal" id="notice-modal" onclick="hideNoticeModal()">
+            <div class="notice-modal-content" onclick="event.stopPropagation()">
+                <div class="notice-modal-header">
+                    <h3 class="notice-modal-title">품질통지서 목록</h3>
+                    <button class="notice-close" onclick="hideNoticeModal()">×</button>
+                </div>
+                <div class="notice-list"></div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+function init() {
+    showNationalView();
+    renderSiteList('concrete-sites', concreteSites, currentConcreteRegion);
+    renderSiteList('compaction-sites', compactionSites);
+    renderSiteList('paving-sites', pavingSites);
+    renderQualityChart();
+    setupEventListeners();
+    renderStructureTable('전국');
+    renderManagerTable('전국');
+        // 채팅창 스크롤을 맨 아래로 이동
+    var chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    // 툴팁 이벤트 리스너 추가
+    document.addEventListener('scroll', hideTooltip);
+    window.addEventListener('resize', hideTooltip);
+}
+
+// 작업 필터 체크박스 토글 함수
+function toggleWorkFilter(element) {
+    // 기타 버튼인 경우 특별 처리
+    var label = element.querySelector('.work-checkbox-label').textContent;
+    if (label.indexOf('기타') >= 0) {
+        toggleOtherSearch(element);
+        return;
+    }
+    var checkbox = element.querySelector('.work-checkbox');
+    var isChecked = checkbox.checked;
+    
+    // 체크박스 상태 토글
+    checkbox.checked = !isChecked;
+    
+    // 시각적 스타일 토글
+    if (!isChecked) {
+        element.classList.add('checked');
+    } else {
+        element.classList.remove('checked');
+    }
+    
+    // 체크된 항목들 알림 (선택사항)
+    var checkedItems = document.querySelectorAll('.work-checkbox-item.checked .work-checkbox-label');
+    var workTypes = Array.from(checkedItems).map(label => label.textContent);
+    
+    if (workTypes.length > 0) {
+        console.log('선택된 작업 유형:', workTypes);
+    }
+}
+// 기타 검색 기능
+function toggleOtherSearch(element) {
+    var searchContainer = document.getElementById('work-search-container');
+    var checkbox = element.querySelector('.work-checkbox');
+    var isChecked = checkbox.checked;
+    
+    if (!isChecked) {
+        element.classList.add('checked');
+        checkbox.checked = true;
+        searchContainer.classList.add('show');
+        
+        // 검색창에 포커스
+        setTimeout(function() {
+            document.getElementById('work-search-input').focus();
+        }, 300);
+    } else {
+        element.classList.remove('checked');
+        checkbox.checked = false;
+        searchContainer.classList.remove('show');
+        document.getElementById('work-search-input').value = '';
+    }
+}
+
+// 작업 키워드 검색
+function searchWork() {
+    var keyword = document.getElementById('work-search-input').value.trim();
+    
+    if (keyword) {
+        showAlert('🔍 "' + keyword + '" 작업을 검색했어! (실제로는 필터링 기능이 동작할거야)');
+        console.log('검색 키워드:', keyword);
+    } else {
+        showAlert('검색할 키워드를 입력해줘! 📝');
+    }
+}
+
+// Enter 키 검색 지원
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('work-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchWork();
+            }
+        });
+    }
+});
+    // 이벤트 리스너 설정
+function setupEventListeners() {
+    var backButton = document.getElementById('back-button');
+    var chatSendBtn = document.getElementById('chat-send-btn');
+    var chatInput = document.getElementById('chat-input');
+// 구조물 필터 버튼 이벤트 추가 (setupEventListeners 함수 안에)
+var structureFilterButtons = document.querySelectorAll('#structure-filter-buttons .filter-btn');
+structureFilterButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var region = this.getAttribute('data-region');
+        
+        // 모든 버튼에서 active 클래스 제거
+        structureFilterButtons.forEach(function(b) {
+            b.classList.remove('active');
+        });
+        
+        // 클릭된 버튼에 active 클래스 추가
+        this.classList.add('active');
+        
+        // 테이블 업데이트
+        currentStructureRegion = region;
+        renderStructureTable(region);
+        
+        // 알림
+        showAlert(region + ' 구조물 현황으로 변경되었습니다! 🏗️');
+    });
+});
+    if (backButton) {
+        backButton.onclick = showNationalView;
+    }
+    
+    if (chatSendBtn) {
+        chatSendBtn.onclick = sendMessage;
+    }
+    
+    if (chatInput) {
+        chatInput.onkeypress = function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        };
+    }
+
+    // 품질 차트 필터 버튼 이벤트 추가
+    var filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var region = this.getAttribute('data-region');
+            
+            // 모든 버튼에서 active 클래스 제거
+            filterButtons.forEach(function(b) {
+                b.classList.remove('active');
+            });
+            
+            // 클릭된 버튼에 active 클래스 추가
+            this.classList.add('active');
+            
+            // 차트 업데이트
+            currentQualityRegion = region;
+            renderQualityChart(region);
+            
+            // 알림
+            showAlert(region + ' 품질현황으로 변경되었습니다! 📊');
+        });
+    });
+
+
+// 레미콘 타설 현장 필터 버튼 이벤트 추가
+    var concreteFilterButtons = document.querySelectorAll('#concrete-filter-buttons .filter-btn');
+    concreteFilterButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var region = this.getAttribute('data-region');
+            
+            // 모든 버튼에서 active 클래스 제거
+            concreteFilterButtons.forEach(function(b) {
+                b.classList.remove('active');
+            });
+            
+            // 클릭된 버튼에 active 클래스 추가
+            this.classList.add('active');
+            
+            // 현장 목록 업데이트
+            currentConcreteRegion = region;
+            renderSiteList('concrete-sites', concreteSites, region);
+            
+            // 알림
+            showAlert(region + ' 레미콘 타설현장으로 변경되었습니다! 🚛');
+        });
+    });
+}
+// 도로 포장 현장 필터 버튼 이벤트 추가
+var pavingFilterButtons = document.querySelectorAll('#paving-filter-buttons .filter-btn');
+pavingFilterButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var region = this.getAttribute('data-region');
+        
+        // 모든 버튼에서 active 클래스 제거
+        pavingFilterButtons.forEach(function(b) {
+            b.classList.remove('active');
+        });
+        
+        // 클릭된 버튼에 active 클래스 추가
+        this.classList.add('active');
+        
+        // 현장 목록 업데이트
+        currentPavingRegion = region;
+        renderSiteList('paving-sites', pavingSites, region);
+        
+        // 알림
+        showAlert(region + ' 도로포장 현장으로 변경되었습니다! 🛣️');
+    });
+});
+
+// 도로 포장 SMS 버튼 이벤트
+var pavingSmsButton = document.getElementById('paving-sms-button');
+if (pavingSmsButton) {
+    pavingSmsButton.addEventListener('click', showSMSModal);
+}
+    // 전국 현황 보기
+    function showNationalView() {
+        currentView = 'national';
+        var regionsGrid = document.getElementById('regions-grid');
+        var backButton = document.getElementById('back-button');
+        
+        if (regionsGrid) {
+            var html = '';
+            for (var i = 0; i < regionsData.length; i++) {
+                var region = regionsData[i];
+                html += '<div class="region-item" onclick="showRegionalView(\'' + region.name + '\')">';
+                html += '<div class="region-name">📍 ' + region.name + '</div>';
+                html += '<div class="region-count">' + region.count + '개 현장</div>';
+                html += '</div>';
+            }
+            regionsGrid.innerHTML = html;
+        }
+        
+        if (backButton) {
+            backButton.style.display = 'none';
+        }
+    }
+
+    // 권역별 상세 보기
+    function showRegionalView(regionName) {
+        currentView = 'regional';
+        currentRegion = regionName;
+        var regionsGrid = document.getElementById('regions-grid');
+        var backButton = document.getElementById('back-button');
+        
+        if (regionsGrid) {
+            var projects = regionProjects[regionName] || [];
+            var html = '<div class="region-detail-header">' + regionName + ' 건설현장 목록</div>';
+            html += '<div class="project-list">';
+            
+            for (var i = 0; i < projects.length; i++) {
+                var project = projects[i];
+                html += '<div class="project-item">';
+                html += '<div class="project-name">' + project.name + '</div>';
+                html += '<div class="project-location">' + project.location + ' | ' + project.status + '</div>';
+                html += '<div class="project-progress">';
+                html += '<div class="progress-bar">';
+                html += '<div class="progress-fill" style="width: ' + project.progress + '%"></div>';
+                html += '</div>';
+                html += '<div class="progress-text">' + project.progress + '%</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            regionsGrid.innerHTML = html;
+        }
+        
+        if (backButton) {
+            backButton.style.display = 'block';
+        }
+    }
+
+    // 현장 목록 렌더링
+function renderSiteList(containerId, sites, region) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    
+    var sitesToShow = [];
+    var totalVolume = 0;
+    
+if (containerId === 'concrete-sites') {
+    // 레미콘 타설 현장의 경우 권역별 필터링
+    if (region === '전국' || !region) {
+        Object.keys(sites).forEach(function(key) {
+            sitesToShow = sitesToShow.concat(sites[key]);
+        });
+    } else {
+        sitesToShow = sites[region] || [];
+    }
+    
+    // 총 타설량 계산
+    sitesToShow.forEach(function(site) {
+        totalVolume += site.volume || 0;
+    });
+    
+    // 요약 정보 업데이트
+    updateConcreteSummary(sitesToShow.length, totalVolume);
+} else if (containerId === 'paving-sites') {
+    // 도로 포장 현장의 경우 권역별 필터링
+    var totalArea = 0;
+    
+    if (region === '전국' || !region) {
+        Object.keys(sites).forEach(function(key) {
+            sitesToShow = sitesToShow.concat(sites[key]);
+        });
+    } else {
+        sitesToShow = sites[region] || [];
+    }
+    
+    // 총 포장면적 계산
+    sitesToShow.forEach(function(site) {
+        totalArea += site.area || 0;
+    });
+    
+    // 요약 정보 업데이트
+    updatePavingSummary(sitesToShow.length, totalArea);
+} else {
+    // 다른 현장들은 기존 방식
+    sitesToShow = sites;
+}
+    
+    var html = '';
+    for (var i = 0; i < sitesToShow.length; i++) {
+        var site = sitesToShow[i];
+        html += '<div class="site-item">';
+        html += '<div class="site-info">';
+        html += '<div class="site-name">' + site.name + '</div>';
+        html += '<div class="site-details">' + site.location + '</div>';
+        html += '</div>';
+        
+// 레미콘 타설량 정보 표시
+if (containerId === 'concrete-sites' && site.volume) {
+    html += '<div class="volume-info">';
+    html += '<div class="volume-amount">' + site.volume + '</div>';
+    html += '<div class="volume-unit">㎥</div>';
+    html += '</div>';
+}
+
+// 도로 포장면적 정보 표시
+if (containerId === 'paving-sites' && site.area) {
+    html += '<div class="area-info">';
+    html += '<div class="area-amount">' + site.area.toLocaleString() + '</div>';
+    html += '<div class="area-unit">㎡</div>';
+    html += '</div>';
+}
+        
+        if (site.weather && site.weatherData) {
+            html += '<div class="weather-icon weather-' + site.weather + '" onmouseenter="showTooltip(event, \'' + site.weather + '\', ' + JSON.stringify(site.weatherData).replace(/"/g, '&quot;') + ', \'' + containerId + '\')" onmouseleave="hideTooltip()">';
+            html += getWeatherIcon(site.weather);
+            html += '</div>';
+        } else if (site.weather) {
+            html += '<div class="weather-icon weather-' + site.weather + '">';
+            html += getWeatherIcon(site.weather);
+            html += '</div>';
+        }
+        
+        html += '</div>';
+    }
+    container.innerHTML = html;
+}
+
+// 도로 포장 요약 정보 업데이트
+function updatePavingSummary(siteCount, totalArea) {
+    var siteCountEl = document.getElementById('paving-site-count');
+    var totalAreaEl = document.getElementById('paving-total-area');
+    
+    if (siteCountEl) {
+        siteCountEl.textContent = siteCount + '개소';
+    }
+    
+    if (totalAreaEl) {
+        totalAreaEl.textContent = totalArea.toLocaleString() + '㎡';
+    }
+}
+
+// 레미콘 요약 정보 업데이트
+function updateConcreteSummary(siteCount, totalVolume) {
+    var siteCountEl = document.getElementById('concrete-site-count');
+    var totalVolumeEl = document.getElementById('concrete-total-volume');
+    
+    if (siteCountEl) {
+        siteCountEl.textContent = siteCount + '개소';
+    }
+    
+    if (totalVolumeEl) {
+        totalVolumeEl.textContent = totalVolume.toLocaleString() + '㎥';
+    }
+}
+
+function init() {
+    showNationalView();
+    renderSiteList('concrete-sites', concreteSites, currentConcreteRegion);
+    renderSiteList('compaction-sites', compactionSites);
+    renderSiteList('paving-sites', pavingSites, currentPavingRegion);  // 이 부분 수정
+    renderQualityChart();
+    setupEventListeners();
+    renderStructureTable('전국');
+    
+    // 툴팁 이벤트 리스너 추가
+    document.addEventListener('scroll', hideTooltip);
+    window.addEventListener('resize', hideTooltip);
+}
+
+    // 툴팁 표시
+    function showTooltip(event, weatherType, weatherData, siteType) {
+        hideTooltip(); // 기존 툴팁 제거
+        
+        var tooltip = document.createElement('div');
+        tooltip.className = 'weather-tooltip';
+        tooltip.id = 'weather-tooltip';
+        
+        // 툴팁 내용 생성
+        var tooltipHtml = '';
+        
+        // 헤더
+        tooltipHtml += '<div class="tooltip-header">';
+        tooltipHtml += '<div class="tooltip-icon">' + getWeatherIcon(weatherType) + '</div>';
+        tooltipHtml += '<div class="tooltip-title">' + getWeatherTitle(weatherType) + '</div>';
+        tooltipHtml += '</div>';
+        
+        // 현재 기상 데이터
+        tooltipHtml += '<div class="tooltip-content">';
+        tooltipHtml += '<div class="weather-data">';
+        tooltipHtml += '<span class="weather-label">현재 상황:</span>';
+        tooltipHtml += '<span class="weather-value ' + (weatherData.status === 'critical' ? 'weather-critical' : 'weather-safe') + '">';
+        tooltipHtml += weatherData.current + weatherData.unit;
+        tooltipHtml += '</span>';
+        tooltipHtml += '</div>';
+        
+        tooltipHtml += '<div class="weather-data">';
+        tooltipHtml += '<span class="weather-label">예보:</span>';
+        tooltipHtml += '<span class="weather-value">' + weatherData.forecast + '</span>';
+        tooltipHtml += '</div>';
+        
+        // 품질관리 기준
+        tooltipHtml += '<div class="quality-standard">';
+        tooltipHtml += '<div class="standard-title">품질관리 기준</div>';
+        tooltipHtml += '<div class="standard-text">';
+        tooltipHtml += getQualityStandard(weatherType, siteType) + '<br>';
+        tooltipHtml += '기준값: ' + weatherData.standard;
+        tooltipHtml += '</div>';
+        tooltipHtml += '</div>';
+        
+        tooltipHtml += '</div>';
+        
+        tooltip.innerHTML = tooltipHtml;
+        document.body.appendChild(tooltip);
+        
+        // 위치 계산
+        positionTooltip(tooltip, event);
+        
+        // 표시
+        setTimeout(function() {
+            tooltip.style.opacity = '1';
+            tooltip.style.visibility = 'visible';
+        }, 10);
+    }
+
+    // 툴팁 숨기기
+    function hideTooltip() {
+        var existingTooltip = document.getElementById('weather-tooltip');
+        if (existingTooltip) {
+            existingTooltip.remove();
+        }
+    }
+
+    // 툴팁 위치 계산
+    function positionTooltip(tooltip, event) {
+        var rect = tooltip.getBoundingClientRect();
+        var x = event.clientX;
+        var y = event.clientY;
+        
+        // 화면 경계 확인
+        var windowWidth = window.innerWidth;
+        var windowHeight = window.innerHeight;
+        var tooltipWidth = 320; // max-width 값
+        var tooltipHeight = rect.height || 200; // 예상 높이
+        
+        // X 위치 조정
+        if (x + tooltipWidth > windowWidth - 20) {
+            x = windowWidth - tooltipWidth - 20;
+        }
+        if (x < 20) {
+            x = 20;
+        }
+        
+        // Y 위치 조정
+        if (y + tooltipHeight > windowHeight - 20) {
+            y = y - tooltipHeight - 20;
+        } else {
+            y = y + 20;
+        }
+        
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    }
+
+    // 날씨 제목
+    function getWeatherTitle(weatherType) {
+        var titles = {
+            'rain': '강수량 정보',
+            'hot': '기온 정보',
+            'cold': '저온 정보',
+            'wind': '풍속 정보'
+        };
+        return titles[weatherType] || '기상 정보';
+    }
+
+    // 공사 종류별 품질관리 기준
+    function getQualityStandard(weatherType, siteType) {
+        var standards = {
+            'concrete-sites': {
+                'rain': '콘크리트 타설 시 강수량이 기준을 초과하면 작업 중단',
+                'wind': '강풍 시 타워크레인 및 고소작업 금지',
+                'hot': '고온 시 양생 관리 및 수분 공급 필수',
+                'cold': '저온 시 동결방지제 사용 및 보온양생 실시'
+            },
+            'compaction-sites': {
+                'rain': '다짐작업 시 강수로 인한 함수비 증가 방지',
+                'wind': '강풍 시 장비 작업 안전성 확보',
+                'hot': '고온 시 재료 품질 관리 및 작업시간 조정',
+                'cold': '저온 시 동결 방지 및 다짐 품질 확보'
+            },
+            'paving-sites': {
+                'rain': '아스팔트 포장 시 강수는 작업품질에 치명적',
+                'wind': '강풍 시 포장재료 비산 방지 및 안전관리',
+                'hot': '고온에서 아스팔트 품질저하 방지 조치 필요',
+                'cold': '저온 시 포장재 온도관리 및 다짐 품질 확보'
+            }
+        };
+        
+        return standards[siteType] && standards[siteType][weatherType] 
+            ? standards[siteType][weatherType] 
+            : '해당 기상조건에 대한 품질관리 기준 적용';
+    }
+
+    // 날씨 아이콘
+    function getWeatherIcon(weather) {
+        var icons = {
+            'rain': '🌧️',
+            'hot': '🌡️',
+            'cold': '❄️',
+            'wind': '💨'
+        };
+        return icons[weather] || '';
+    }
+
+    // 품질 차트 렌더링
+function renderQualityChart(region) {
+    var container = document.getElementById('quality-chart');
+    if (!container) return;
+    
+    region = region || currentQualityRegion;
+    var data = qualityData[region] || qualityData['전국'];
+    
+    var maxCount = 0;
+    var totalCount = 0;
+    for (var i = 0; i < data.length; i++) {
+        if (data[i].count > maxCount) {
+            maxCount = data[i].count;
+        }
+        totalCount += data[i].count;
+    }
+    
+    var html = '';
+    for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var width = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+        var percentage = totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0;
+        
+        html += '<div class="quality-bar">';
+        html += '<div class="quality-label quality-' + item.color + '">' + item.label + '</div>';
+        html += '<div class="bar-container">';
+        html += '<div class="bar-fill bar-' + item.color + '" style="width: ' + width + '%">';
+        html += item.count;
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="quality-count">' + percentage + '%</div>';
+        html += '</div>';
+    }
+    
+    container.innerHTML = html;
+}
+
+    // 메시지 전송
+    function sendMessage() {
+        var input = document.getElementById('chat-input');
+        var messages = document.getElementById('chat-messages');
+        
+        if (!input || !messages) return;
+        
+        var message = input.value.trim();
+        if (!message) return;
+        
+        // 사용자 메시지 추가
+        var userMsg = document.createElement('div');
+        userMsg.className = 'chat-message chat-user';
+        userMsg.textContent = message;
+        messages.appendChild(userMsg);
+        
+        // 봇 응답
+        setTimeout(function() {
+            var botMsg = document.createElement('div');
+            botMsg.className = 'chat-message chat-bot';
+            botMsg.textContent = getBotResponse(message);
+            messages.appendChild(botMsg);
+            messages.scrollTop = messages.scrollHeight;
+        }, 1000);
+        
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // 봇 응답
+    function getBotResponse(message) {
+        var lower = message.toLowerCase();
+        
+        if (lower.indexOf('콘크리트') >= 0 || lower.indexOf('레미콘') >= 0) {
+            return '콘크리트 타설 시 주요 품질관리 요소:\n• 슬럭프 값: 12±2.5cm\n• 공기량: 4.5±1.5%\n• 압축강도: 설계기준강도 이상';
+        } else if (lower.indexOf('다짐') >= 0) {
+            return '다짐 작업의 품질기준:\n• 다짐도: 95% 이상\n• 함수비: 최적함수비 ±2%\n• 평탄성: ±2cm 이내';
+        } else if (lower.indexOf('포장') >= 0 || lower.indexOf('도로') >= 0) {
+            return '도로 포장 품질기준:\n• 아스팔트 온도: 110°C~160°C\n• 다짐 온도: 80°C 이상\n• 평탄성: IRI 2.5 이하';
+        } else {
+            return '안녕하세요! 다음과 같은 품질관리 정보를 제공할 수 있습니다:\n• 콘크리트 타설 기준\n• 다짐 작업 기준\n• 도로 포장 기준\n구체적인 항목을 말씀해 주세요!';
+        }
+    }
+
+    // 알림 표시
+    function showAlert(message) {
+        var notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(function() {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+
+    // 페이지 로드 시 초기화
+    window.addEventListener('load', function() {
+        init();
+        renderManagerTable('전국');  // 이 줄 추가!
+        setTimeout(function() {
+            showAlert('건설공사 품질관리 대시보드에 오신 것을 환영합니다! 🏗️');
+        }, 500);
+    });
+
+    // 실시간 업데이트 시뮬레이션
+    setInterval(function() {
+        for (var i = 0; i < regionsData.length; i++) {
+            var change = Math.floor(Math.random() * 3) - 1;
+            regionsData[i].count = Math.max(1, regionsData[i].count + change);
+        }
+        
+        if (currentView === 'national') {
+            showNationalView();
+        } else if (currentView === 'regional') {
+            showRegionalView(currentRegion);
+        }
+    }, 30000);
+
+// 드래그 앤 드롭 기능
+var draggedElement = null;
+var draggedId = null;
+
+// 드래그 시작
+document.addEventListener('dragstart', function(e) {
+    if (e.target.classList.contains('grid-item')) {
+        draggedElement = e.target;
+        draggedId = e.target.getAttribute('data-widget-id');
+        e.target.classList.add('dragging');
+        
+        // 드래그 데이터 설정
+        e.dataTransfer.setData('text/plain', draggedId);
+        e.dataTransfer.effectAllowed = 'move';
+    }
+});
+
+// 드래그 종료
+document.addEventListener('dragend', function(e) {
+    if (e.target.classList.contains('grid-item')) {
+        e.target.classList.remove('dragging');
+        
+        // 모든 drag-over 클래스 제거
+        var allItems = document.querySelectorAll('.grid-item');
+        allItems.forEach(function(item) {
+            item.classList.remove('drag-over');
+        });
+    }
+});
+
+// 드래그 오버
+document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+});
+
+// 드래그 엔터
+document.addEventListener('dragenter', function(e) {
+    if (e.target.classList.contains('grid-item') && e.target !== draggedElement) {
+        e.target.classList.add('drag-over');
+    }
+});
+
+// 드래그 리브
+document.addEventListener('dragleave', function(e) {
+    if (e.target.classList.contains('grid-item')) {
+        e.target.classList.remove('drag-over');
+    }
+});
+
+// 드롭
+document.addEventListener('drop', function(e) {
+    e.preventDefault();
+    
+    if (e.target.classList.contains('grid-item') && e.target !== draggedElement) {
+        var targetId = e.target.getAttribute('data-widget-id');
+        
+        if (draggedId && targetId && draggedId !== targetId) {
+            swapWidgets(draggedId, targetId);
+        }
+    }
+    
+    // 모든 drag-over 클래스 제거
+    var allItems = document.querySelectorAll('.grid-item');
+    allItems.forEach(function(item) {
+        item.classList.remove('drag-over');
+    });
+});
+
+// 위젯 위치 교환 함수
+function swapWidgets(id1, id2) {
+    var widget1 = document.querySelector('[data-widget-id="' + id1 + '"]');
+    var widget2 = document.querySelector('[data-widget-id="' + id2 + '"]');
+    
+    if (widget1 && widget2) {
+        // 부모 요소들
+        var parent1 = widget1.parentNode;
+        var parent2 = widget2.parentNode;
+        
+        // 다음 형제 요소들 (위치 참조용)
+        var next1 = widget1.nextSibling;
+        var next2 = widget2.nextSibling;
+        
+        // 위치 교환
+        if (next1) {
+            parent1.insertBefore(widget2, next1);
+        } else {
+            parent1.appendChild(widget2);
+        }
+        
+        if (next2) {
+            parent2.insertBefore(widget1, next2);
+        } else {
+            parent2.appendChild(widget1);
+        }
+        
+        // 성공 알림
+        showAlert('위젯 위치가 변경되었습니다! 🔄');
+    }
+}
+
+// setupEventListeners 함수에 추가 (기존 함수 안에 추가)
+// 드래그 앤 드롭은 이미 document 레벨에서 처리하므로 추가 설정 불필요
+// SMS 모달 기능
+function showSMSModal() {
+    var modal = document.getElementById('sms-modal');
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideSMSModal() {
+    var modal = document.getElementById('sms-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        // 폼 초기화
+        document.getElementById('sms-sender').value = '';
+        document.getElementById('sms-receiver').value = '';
+        document.getElementById('sms-message').value = '';
+        updateCharCount();
+    }
+}
+
+function updateCharCount() {
+    var textarea = document.getElementById('sms-message');
+    var charCount = document.getElementById('char-count');
+    var count = textarea.value.length;
+    var limit = 1000;
+    
+    charCount.textContent = count + '/' + limit + '자';
+    charCount.style.color = count > limit ? '#e74c3c' : '#666';
+}
+
+function sendSMS() {
+    var sender = document.getElementById('sms-sender').value.trim();
+    var receiver = document.getElementById('sms-receiver').value.trim();
+    var message = document.getElementById('sms-message').value.trim();
+    
+    if (!sender || !receiver || !message) {
+        showAlert('모든 항목을 입력해주세요! 📝');
+        return;
+    }
+    
+    // 실제로는 SMS API 호출
+    showAlert('문자가 발송되었습니다! 📱✨');
+    hideSMSModal();
+}
+
+// SMS 버튼 이벤트 (setupEventListeners 함수에 추가)
+// 기존 setupEventListeners 함수 끝부분에 추가:
+    
+    // SMS 버튼 이벤트
+    var smsButton = document.getElementById('sms-button');
+    if (smsButton) {
+        smsButton.addEventListener('click', showSMSModal);
+    }
+
+</script>
+<!-- SMS 모달 -->
+    <div class="sms-modal" id="sms-modal">
+        <div class="sms-modal-content">
+            <div class="sms-modal-header">
+                <h3 class="sms-modal-title">📱 문자 메시지 발송</h3>
+                <button class="sms-close" onclick="hideSMSModal()">×</button>
+            </div>
+            
+            <div class="sms-form-group">
+                <label class="sms-label" for="sms-sender">발신자 번호</label>
+                <input type="tel" class="sms-input" id="sms-sender" placeholder="010-1234-5678">
+            </div>
+            
+            <div class="sms-form-group">
+                <label class="sms-label" for="sms-receiver">수신자 번호</label>
+                <input type="tel" class="sms-input" id="sms-receiver" placeholder="010-9876-5432">
+            </div>
+            
+            <div class="sms-form-group">
+                <label class="sms-label" for="sms-message">메시지 내용</label>
+                <textarea class="sms-textarea" id="sms-message" placeholder="날씨 정보 및 작업 현황을 입력하세요..." oninput="updateCharCount()" maxlength="1000"></textarea>
+                <div class="sms-char-count" id="char-count">0/1000자</div>
+            </div>
+            
+            <div class="sms-buttons">
+                <button class="sms-btn sms-btn-cancel" onclick="hideSMSModal()">취소</button>
+                <button class="sms-btn sms-btn-send" onclick="sendSMS()">📱 발송</button>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript 모듈들 (ES6 Modules) -->
-    <script type="module" src="src/js/main.js"></script>
 </body>
 </html>
